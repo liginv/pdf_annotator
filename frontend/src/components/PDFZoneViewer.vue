@@ -1,12 +1,12 @@
 <template>
 <div class='pdf-zone-viewer' v-if="selections.length > 0">
   
-  <textarea 
+  <!--textarea 
     @keyup="changed"
     ref="textarea"
     v-model="uzn"
     @blur="stopEditing"
-    @focus="startEditing"></textarea>
+    @focus="startEditing"></textarea-->
 </div>
 </template>
 
@@ -15,6 +15,7 @@ export default {
   props: ['selections', 'batchUpdateSelections', 'originalFilename', 'dimensions'],
   data () {
     return {
+      ob: [],
       uzn: null,
       editing: false
     }
@@ -56,6 +57,16 @@ export default {
       let lines = this.selections.map((s) => {
         let y0 = parseInt(this.dimensions.height - s.coordinates.top)
         let y1 = parseInt(this.dimensions.height - s.coordinates.top - s.coordinates.height)
+        this.ob.push({
+          name: s.name,
+          pageno: s.coordinates.page,
+          cordinates: {
+            x1: s.coordinates.left,
+            y1: Math.max(y0, y1),
+            x4: s.coordinates.left + s.coordinates.width,
+            y4: Math.min(y0, y1)
+          }
+        })
         let bbox = [
           s.coordinates.left,
           Math.max(y0, y1),
@@ -65,9 +76,10 @@ export default {
         let query = `LTPage[pageid=\\'${s.coordinates.page}\\'] LTTextLineHorizontal:overlaps_bbox("${bbox}")`
         return `\t('${s.name}', '${query}')`
       })
-
+      this.$emit('updateob', this.ob)
       let pretty = lines.join(',\n')
       this.uzn = `pdf = pdfquery.PDFQuery('${this.originalFilename}')\n\npdf.extract([\n\t('with_formatter', 'text'),\n${pretty}\n])`
+      console.log(this.ob)
     },
     changed (event) {
       console.log('CHANGED')

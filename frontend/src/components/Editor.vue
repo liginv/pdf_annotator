@@ -2,9 +2,12 @@
   <div class='editor'>
     <div class='sidebar'>
       <h1>PDF - Annotator</h1>
-      <Uploader :notify="newFile"></Uploader>
+      <Uploader @addfile="addfile" :notify="newFile"></Uploader>
       <ZoneViewer :selections="selections" class='zone-viewer' :batchUpdateSelections="batchUpdateSelections" :originalFilename="name" v-if="src"></ZoneViewer>
-      <PDFZoneViewer :dimensions="pdfDimensions" :selections="selections" class='zone-viewer' :batchUpdateSelections="batchUpdateSelections" :originalFilename="name" v-if="arrayBuffer"></PDFZoneViewer>
+      <PDFZoneViewer @updateob="updateobj" :dimensions="pdfDimensions" :selections="selections" class='zone-viewer' :batchUpdateSelections="batchUpdateSelections" :originalFilename="name" v-if="arrayBuffer"></PDFZoneViewer>
+      <button @click="poost">
+          <center>submit</center>
+        </button>
     </div>
     <div class='content'>
       <Annotator :src="src" :setPdfSize="setPdfSize" :arrayBuffer="arrayBuffer" :name="name" :selections="selections" :addSelection="addSelection"></Annotator>
@@ -29,6 +32,10 @@ export default {
   },
   data () {
     return {
+      c: 0,
+      change: false,
+      file: null,
+      ob: [],
       src: null,
       arrayBuffer: null,
       name: '',
@@ -40,6 +47,34 @@ export default {
     }
   },
   methods: {
+    addfile (file) {
+      this.file = file
+    },
+    post () {
+      if (this.change) {
+        console.log(this.name)
+        this.change = false
+      }
+    },
+    poost () {
+      this.post()
+      console.log([{
+        pdf: this.file,
+        name: this.name,
+        details: this.ob
+      }])
+      this.$http.post('https://jsonplaceholder.typicode.com/posts/', {
+        'userId': 1,
+        'id': 1,
+        'title': 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
+        'body': 'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
+      }).then(function (data) {
+        console.log(data)
+      })
+    },
+    updateobj (data) {
+      this.ob = data
+    },
     batchUpdateSelections: function (selections) {
       this.selections = selections
     },
@@ -67,12 +102,19 @@ export default {
         color: randomColor({format: 'rgb'}),
         name: 'Box' + this.selections.length
       })
+      // console.log(this.selections)
     },
     newFile: function (data) {
+      if (this.name === data) {
+        this.change = false
+      } else {
+        this.change = true
+      }
       this.name = data.name
       this.src = data.src
       this.arrayBuffer = data.arrayBuffer
       this.selections = []
+      this.ob = []
     }
   }
 }
@@ -95,6 +137,7 @@ export default {
   top: 0;
   left: 0;
   padding: 10px;
+  align-content: center
 }
 
 .content {
