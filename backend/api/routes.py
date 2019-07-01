@@ -1,8 +1,12 @@
 from api.models import Pdf, Zone
-from flask import request, jsonify
+from flask import request, jsonify, render_template
 from api import app, db
 from api.schema import zone_schema, pdf_schema, zones_schema
 import json
+
+@app.route('/', methods=['GET'])
+def home():
+	return render_template('index.html')
 
 @app.route('/post_pdf', methods=['POST'])
 def post_pdf():
@@ -16,7 +20,7 @@ def post_pdf():
 
 @app.route('/put_zones', methods=['PUT'])
 def put_zones():
-	zones = json.loads(request.form['zones'])
+	zones = request.json['zones']
 	output = []
 	for zone_obj in zones:
 		zone = Zone.query.get(zone_obj.get('zid'))
@@ -32,8 +36,7 @@ def put_zones():
 
 @app.route('/post_zones', methods=['POST'])
 def post_zones():
-	pid = json.loads(request.form['pid'])
-	zones = json.loads(request.form['zones'])
+	zones = request.json['zones']
 	output = []
 	for zone_obj in zones:
 		zone = Zone(zone_obj.get('zname'),zone_obj.get('lx'),zone_obj.get('ly'),zone_obj.get('rx'),zone_obj.get('ry'))
@@ -47,7 +50,7 @@ def post_zones():
 
 @app.route('/delete_zones', methods=['DELETE'])
 def delete_zones():
-	zones = json.loads(request.form['zones'])
+	zones = request.json['zones']
 	output = []
 	for zone_obj in zones:
 		zone = Zone.query.get(zone_obj.get('zid'))
