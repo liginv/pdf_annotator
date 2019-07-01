@@ -35,6 +35,7 @@ export default {
   props: ['src', 'name', 'selections', 'addSelection', 'arrayBuffer', 'setPdfSize'],
   data () {
     return {
+      text: '',
       down: false,
       coords: {
         xa: null,
@@ -90,6 +91,7 @@ export default {
       this.down = false
       this.addSelection(this.coordinates)
       this.reset()
+      console.log(this.text)
     },
     drag: function (event) {
       event.stopPropagation()
@@ -97,6 +99,8 @@ export default {
       if (this.down) {
         this.coords.xb = event.offsetX
         this.coords.yb = event.offsetY
+        let text = window.getSelection()
+        this.text = text.toString()
       }
     }
   }

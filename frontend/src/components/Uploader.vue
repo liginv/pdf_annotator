@@ -18,7 +18,8 @@ export default {
   },
   data () {
     return {
-      name: null
+      name: null,
+      pdf_file: null
     }
   },
   methods: {
@@ -43,13 +44,16 @@ export default {
         let reader = new FileReader()
         reader.addEventListener('load', this.processReaderImage, false)
         reader.readAsDataURL(file)
+        this.pdf_file = file
       } else if (file.type.match('.*pdf.*')) {
         let reader = new FileReader()
         reader.addEventListener('load', this.processReaderPDF, false)
         reader.readAsArrayBuffer(file)
+        this.pdf_file = file
       } else {
         alert('Not a PDF or image file')
       }
+      this.$emit('addfile', this.pdf)
     },
     selected: function (event) {
       this.getFile(event.target.files)
