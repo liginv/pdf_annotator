@@ -1,9 +1,7 @@
 <template>
-  <div>
     <div ref="pdf-container" class="pdf-container" :style="styleObject">
       <div class="pdfViewer"></div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -291,6 +289,7 @@ export default {
 
 .pdfViewer .canvasWrapper {
   overflow: hidden;
+  position:absolute;
 }
 
 .pdfViewer .page {

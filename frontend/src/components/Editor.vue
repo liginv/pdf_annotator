@@ -11,6 +11,12 @@
     </div>
     <div class='content'>
       <Annotator :src="src" :setPdfSize="setPdfSize" :arrayBuffer="arrayBuffer" :name="name" :selections="selections" :addSelection="addSelection"></Annotator>
+      <!--div v-for="ob in obs" :key='ob'>
+      <select name="2" id="2">
+        <option value="af">sdsdg</option>
+        <option value="a">fadfa</option>
+      </select>
+      </div-->
     </div>
   </div>
 </template>
@@ -32,10 +38,12 @@ export default {
   },
   data () {
     return {
-      c: 0,
+      style: [],
+      old_obs: [],
+      req1_stat: false,
       change: false,
       file: null,
-      ob: [],
+      obs: [],
       src: null,
       arrayBuffer: null,
       name: '',
@@ -52,28 +60,51 @@ export default {
     },
     post () {
       if (this.change) {
-        console.log(this.name)
-        this.change = false
+        this.req1_stat = true
+        // console.log(this.name)
+        this.$http.post('https://jsonplaceholder.typicode.com/posts', {
+          'userId': 1,
+          'id': 1,
+          'title': 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
+          'body': 'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
+        }).then(function (data) {
+          console.log(data)
+          console.log([{
+            pdf: this.file,
+            name: this.name
+          }])
+          /* for (let i = 0; i < 20; i++) {
+            console.log('d')
+          } */
+          console.log('wait finished')
+          // this.obs = data
+          this.change = false
+          this.req1_stat = false
+          this.poost()
+        })
       }
     },
     poost () {
       this.post()
-      console.log([{
-        pdf: this.file,
-        name: this.name,
-        details: this.ob
-      }])
-      this.$http.post('https://jsonplaceholder.typicode.com/posts/', {
-        'userId': 1,
-        'id': 1,
-        'title': 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
-        'body': 'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
-      }).then(function (data) {
-        console.log(data)
-      })
+      if (!this.req1_stat) {
+        this.$http.post('https://jsonplaceholder.typicode.com/posts', {
+          'userId': 1,
+          'id': 1,
+          'title': 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
+          'body': 'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
+        }).then(function (data) {
+          console.log(data)
+          console.log(this.obs)
+          console.log('finished')
+          // for (data )
+          // this.old_obs = data
+          // this.obs = []
+          this.selections = []
+        })
+      }
     },
     updateobj (data) {
-      this.ob = data
+      this.obs = data
     },
     batchUpdateSelections: function (selections) {
       this.selections = selections
@@ -114,7 +145,8 @@ export default {
       this.src = data.src
       this.arrayBuffer = data.arrayBuffer
       this.selections = []
-      this.ob = []
+      this.obs = []
+      this.style = []
     }
   }
 }
@@ -164,5 +196,10 @@ h1 {
   background: #C50080;
   padding: 10px 25px;
   color: white;
+}
+
+select {
+  position: relative;
+  z-index: 100;
 }
 </style>

@@ -8,6 +8,7 @@
     <div class='selection-area' @mousedown="start" @mouseup="end" @mousemove="drag" v-if="src || arrayBuffer" ref="selectionArea">
       <img :src="src" v-if="src">
       <PDF :setPdfSize="setPdfSize" :arrayBuffer="arrayBuffer" v-if="arrayBuffer"></PDF>
+      <div class="area-select">
       <SelectionPreview :coordinates="coordinates" v-if="arrayBuffer"></SelectionPreview>
       <AreaSelect :coordinates="coordinates" ref="activeSelector" color="rgb(0,255,0)" active="true"></AreaSelect>
       <AreaSelect v-for="selection in selections"
@@ -16,6 +17,13 @@
         :coordinates="selection.coordinates"
         :name="selection.name"
       ></AreaSelect>
+      <!--div v-for="coordinate in coordinates" :key='coordinate'>
+      <select name="2" id="2">
+        <option value="af">sdsdg</option>
+        <option value="a">fadfa</option>
+      </select>
+      </div-->
+      </div>
     </div>
   </div>
 </template>
@@ -109,9 +117,10 @@ export default {
 
 <style scoped>
 .selection-area {
-  position: relative;
+  position: absolute;
   display: inline-block;
   outline: solid 1px black;
+  overflow: hidden;
 }
 
 h3 span.filename {
@@ -127,4 +136,9 @@ h3 span.filetype {
   border-radius: 10px;
   padding: 2px 12px;
 }
+
+.area-select {
+overflow: visible;
+}
+
 </style>

@@ -1,6 +1,7 @@
 <template>
   <div class='selection-box' :style="styleObject">
     <span>{{ name }}</span>
+    <!--input type="text" :value="name" :style="styleObject"-->
   </div>
 </template>
 
@@ -34,12 +35,17 @@ export default {
   pointer-events: none;
   text-align: center;
   z-index: 1000;
+  overflow:visible;
+}
+
+input {
+  position:absolute;
 }
 
 span {
+  overflow: visible;
   color: black;
   display: inline;
-  position: relative;
   font-weight: bold;
   font-size: 12px;
   text-shadow: white 0px 0px 2px, white 0px 0px 2px, white 0px 0px 5px, white 0px 0px 5px, white 0px 0px 30px, white 0px 0px 30px, white 0px 0px 30px, white 0px 0px 30px, white 0px 0px 30px, white 0px 0px 60px, white 0px 0px 60px, white 0px 0px 60px;

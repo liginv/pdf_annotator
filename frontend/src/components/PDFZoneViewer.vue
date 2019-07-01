@@ -15,7 +15,9 @@ export default {
   props: ['selections', 'batchUpdateSelections', 'originalFilename', 'dimensions'],
   data () {
     return {
-      ob: [],
+      c: 0,
+      pr: null,
+      obs: [],
       uzn: null,
       editing: false
     }
@@ -52,21 +54,30 @@ export default {
       }
       if (this.selections.length === 0) {
         this.uzn = ''
+        this.obs = []
+        this.c = 0
         return
       }
       let lines = this.selections.map((s) => {
         let y0 = parseInt(this.dimensions.height - s.coordinates.top)
         let y1 = parseInt(this.dimensions.height - s.coordinates.top - s.coordinates.height)
-        this.ob.push({
-          name: s.name,
-          pageno: s.coordinates.page,
-          cordinates: {
-            x1: s.coordinates.left,
-            y1: Math.max(y0, y1),
-            x4: s.coordinates.left + s.coordinates.width,
-            y4: Math.min(y0, y1)
-          }
-        })
+        // console.log(typeof (s.name))
+        let t = s.coordinates.left
+        if (this.c !== this.selections.length) {
+          this.c++
+          this.obs.push({
+            id: null,
+            name: s.name,
+            pageno: s.coordinates.page,
+            cordinates: {
+              x1: s.coordinates.left,
+              y1: Math.max(y0, y1),
+              x4: s.coordinates.left + s.coordinates.width,
+              y4: Math.min(y0, y1)
+            }
+          })
+        }
+        this.pr = t
         let bbox = [
           s.coordinates.left,
           Math.max(y0, y1),
@@ -76,10 +87,10 @@ export default {
         let query = `LTPage[pageid=\\'${s.coordinates.page}\\'] LTTextLineHorizontal:overlaps_bbox("${bbox}")`
         return `\t('${s.name}', '${query}')`
       })
-      this.$emit('updateob', this.ob)
+      this.$emit('updateob', this.obs)
       let pretty = lines.join(',\n')
       this.uzn = `pdf = pdfquery.PDFQuery('${this.originalFilename}')\n\npdf.extract([\n\t('with_formatter', 'text'),\n${pretty}\n])`
-      console.log(this.ob)
+      console.log(this.obs)
     },
     changed (event) {
       console.log('CHANGED')
@@ -101,6 +112,7 @@ export default {
           selection.name = elements[1]
           selection.page = elements[2]
           index++
+          console.log(selection)
           return selection
         } catch (err) {
           console.log(err)
