@@ -115,7 +115,7 @@ export default {
           selection.name = elements[1]
           selection.page = elements[2]
           index++
-          console.log(selection)
+          // console.log(selection)
           return selection
         } catch (err) {
           console.log(err)

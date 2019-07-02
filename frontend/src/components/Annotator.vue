@@ -102,7 +102,7 @@ export default {
       this.down = false
       this.addSelection(this.coordinates)
       this.reset()
-      console.log(this.text)
+      // console.log(this.text)
     },
     drag: function (event) {
       event.stopPropagation()

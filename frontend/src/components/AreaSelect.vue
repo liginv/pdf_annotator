@@ -11,6 +11,7 @@ export default {
   props: ['coordinates', 'color', 'name', 'active'],
   created () {
     console.log('AreaSelect created')
+    console.log({offset: this.coordinates.pageOffset})
   },
   computed: {
     styleObject: function () {
@@ -29,6 +30,7 @@ export default {
       }
     }
   }
+
 }
 </script>
 

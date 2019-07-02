@@ -5,14 +5,14 @@
       <Uploader @addfile="addfile" :notify="newFile"></Uploader>
       <ZoneViewer :selections="selections" class='zone-viewer' :batchUpdateSelections="batchUpdateSelections" :originalFilename="name" v-if="src"></ZoneViewer>
       <PDFZoneViewer @updateob="updateobj" :dimensions="pdfDimensions" :selections="selections" class='zone-viewer' :batchUpdateSelections="batchUpdateSelections" :originalFilename="name" v-if="arrayBuffer"></PDFZoneViewer>
-      <button @click="poost">
+      <!--button @click="poost">
           <center>submit</center>
-        </button>
+        </button-->
     </div>
     <div class='content'>
       <Annotator :src="src" :setPdfSize="setPdfSize" :arrayBuffer="arrayBuffer" :name="name" :selections="selections" :addSelection="addSelection"></Annotator>
-      <!--div v-for="ob in obs" :key='ob'>
-      <select name="2" id="2">
+      <!--div v-for="st in style" :key='st'>
+      <select name="2" id="2" :style="st">
         <option value="af">sdsdg</option>
         <option value="a">fadfa</option>
       </select>
@@ -107,6 +107,7 @@ export default {
     },
     updateobj (data) {
       this.obs = data
+      // console.log(data)
     },
     batchUpdateSelections: function (selections) {
       this.selections = selections
@@ -121,7 +122,7 @@ export default {
       if (coords.height === 0 || coords.width === 0) {
         return
       }
-
+      console.log(coords.pageOffset)
       this.selections.push({
         id: +new Date(),
         coordinates: {
@@ -135,10 +136,17 @@ export default {
         color: randomColor({format: 'rgb'}),
         name: 'Box' + this.selections.length
       })
+      /* this.style.push({
+        top: coords.top + coords.pageOffset.top + 'px',
+        left: coords.left + coords.pageOffset.left + 'px',
+        height: coords.height + 'px',
+        width: coords.width + 'px'
+      }) */
+      console.log(coords.pageOffset)
       // console.log(this.selections)
     },
     newFile: function (data) {
-      if (this.name === data) {
+      if (this.name === data.name) {
         this.change = false
       } else {
         this.change = true
