@@ -1,5 +1,5 @@
 from api.models import Pdf, Zone
-from flask import request, jsonify, render_template
+from flask import request, Response, jsonify, render_template
 from api import app, db
 from api.schema import zone_schema, pdf_schema, zones_schema
 import json
@@ -8,8 +8,16 @@ import json
 def home():
 	return render_template('index.html')
 
-@app.route('/post_pdf', methods=['POST'])
+@app.route('/post_pdf', methods=['POST','OPTIONS'])
 def post_pdf():
+
+	resp = Response()
+	resp.headers['Access-Control-Allow-Origin'] = '*'
+	if request.method == 'OPTIONS':
+		resp.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+		resp.status_code = 204
+		resp.status = 200
+		return resp
 	#response.headers.add('Access-Control-Allow-Origin', '*')
 	pfile = request.files['pfile']
 	#create a pdf instance by passing respective data
@@ -37,7 +45,9 @@ def put_zones():
 
 @app.route('/post_zones', methods=['POST'])
 def post_zones():
-	response.headers.add('Access-Control-Allow-Origin', '*')
+	resp = Response()
+	resp.headers['Access-Control-Allow-Origin'] = '*'
+	#response.headers.add('Access-Control-Allow-Origin', '*')
 	zones = request.json['zones']
 	output = []
 	for zone_obj in zones:

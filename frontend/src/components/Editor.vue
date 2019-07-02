@@ -5,18 +5,18 @@
       <Uploader @addfile="addfile" :notify="newFile"></Uploader>
       <ZoneViewer :selections="selections" class='zone-viewer' :batchUpdateSelections="batchUpdateSelections" :originalFilename="name" v-if="src"></ZoneViewer>
       <PDFZoneViewer @updateob="updateobj" :dimensions="pdfDimensions" :selections="selections" class='zone-viewer' :batchUpdateSelections="batchUpdateSelections" :originalFilename="name" v-if="arrayBuffer"></PDFZoneViewer>
-      <!--button @click="poost">
+      <button @click="poost">
           <center>submit</center>
-        </button-->
+        </button>
     </div>
     <div class='content'>
       <Annotator :src="src" :setPdfSize="setPdfSize" :arrayBuffer="arrayBuffer" :name="name" :selections="selections" :addSelection="addSelection"></Annotator>
-      <!--div v-for="st in style" :key='st'>
+      <div v-for="st in style" :key='st'>
       <select name="2" id="2" :style="st">
         <option value="af">sdsdg</option>
         <option value="a">fadfa</option>
       </select>
-      </div-->
+      </div>
     </div>
   </div>
 </template>
@@ -68,14 +68,16 @@ export default {
         // console.log(this.name)
         this.$http.post('http://127.0.0.1:5000/post_pdf', {
           pfile: this.file
+        }, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
         }).then(function (data) {
           console.log(data)
           console.log([{
             pdf: this.file,
             name: this.name
-          }]).catch(data => {
-            console.log('cdaddvadv')
-          })
+          }])
           /* for (let i = 0; i < 20; i++) {
             console.log('d')
           } */
@@ -85,16 +87,18 @@ export default {
           this.change = false
           this.req1_stat = false
           this.poost()
+        }).catch(function (data) {
+          console.log('From catch')
         })
       }
     },
     poost () {
       this.post()
-      if (!this.req1_stat) {
+      /* if (!this.req1_stat) {
         this.$http.post('http://127.0.0.1:5000/post_zones', {
           pid: this.pid,
           zones: this.obs.cordinates
-        }).then(function (data) {
+        }, {'Content-Type': 'multipart/form-data'}).then(function (data) {
           console.log(data)
           console.log(this.obs)
           console.log('finished')
@@ -103,7 +107,7 @@ export default {
           // this.obs = []
           this.selections = []
         })
-      }
+      } */
     },
     updateobj (data) {
       this.obs = data
@@ -136,12 +140,12 @@ export default {
         color: randomColor({format: 'rgb'}),
         name: 'Box' + this.selections.length
       })
-      /* this.style.push({
+      this.style.push({
         top: coords.top + coords.pageOffset.top + 'px',
         left: coords.left + coords.pageOffset.left + 'px',
         height: coords.height + 'px',
         width: coords.width + 'px'
-      }) */
+      })
       console.log(coords.pageOffset)
       // console.log(this.selections)
     },
