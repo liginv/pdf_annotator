@@ -17,6 +17,9 @@ export default {
       width: null
     }
   },
+  created () {
+    console.log('PDF created')
+  },
   computed: {
     styleObject () {
       return {

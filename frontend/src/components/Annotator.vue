@@ -40,6 +40,9 @@ export default {
     PDF,
     SelectionPreview
   },
+  created () {
+    console.log('Annotator created')
+  },
   props: ['src', 'name', 'selections', 'addSelection', 'arrayBuffer', 'setPdfSize'],
   data () {
     return {

@@ -38,6 +38,7 @@ export default {
   },
   data () {
     return {
+      pid: null,
       style: [],
       old_obs: [],
       req1_stat: false,
@@ -54,6 +55,9 @@ export default {
       }
     }
   },
+  created () {
+    console.log('Editor created')
+  },
   methods: {
     addfile (file) {
       this.file = file
@@ -62,22 +66,22 @@ export default {
       if (this.change) {
         this.req1_stat = true
         // console.log(this.name)
-        this.$http.post('https://jsonplaceholder.typicode.com/posts', {
-          'userId': 1,
-          'id': 1,
-          'title': 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
-          'body': 'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
+        this.$http.post('http://127.0.0.1:5000/post_pdf', {
+          pfile: this.file
         }).then(function (data) {
           console.log(data)
           console.log([{
             pdf: this.file,
             name: this.name
-          }])
+          }]).catch(data => {
+            console.log('cdaddvadv')
+          })
           /* for (let i = 0; i < 20; i++) {
             console.log('d')
           } */
           console.log('wait finished')
           // this.obs = data
+          this.pid = data.pid
           this.change = false
           this.req1_stat = false
           this.poost()
@@ -87,11 +91,9 @@ export default {
     poost () {
       this.post()
       if (!this.req1_stat) {
-        this.$http.post('https://jsonplaceholder.typicode.com/posts', {
-          'userId': 1,
-          'id': 1,
-          'title': 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
-          'body': 'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
+        this.$http.post('http://127.0.0.1:5000/post_zones', {
+          pid: this.pid,
+          zones: this.obs.cordinates
         }).then(function (data) {
           console.log(data)
           console.log(this.obs)

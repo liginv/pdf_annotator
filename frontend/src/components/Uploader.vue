@@ -22,6 +22,9 @@ export default {
       pdf_file: null
     }
   },
+  created () {
+    console.log('Uploader created')
+  },
   methods: {
     processReaderImage: function (readerData) {
       this.notify({

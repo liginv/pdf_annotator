@@ -10,6 +10,7 @@ def home():
 
 @app.route('/post_pdf', methods=['POST'])
 def post_pdf():
+	#response.headers.add('Access-Control-Allow-Origin', '*')
 	pfile = request.files['pfile']
 	#create a pdf instance by passing respective data
 	pdf = Pdf(pfile.filename,pfile.read())
@@ -36,6 +37,7 @@ def put_zones():
 
 @app.route('/post_zones', methods=['POST'])
 def post_zones():
+	response.headers.add('Access-Control-Allow-Origin', '*')
 	zones = request.json['zones']
 	output = []
 	for zone_obj in zones:

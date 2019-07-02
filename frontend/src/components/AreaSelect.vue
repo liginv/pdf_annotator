@@ -9,6 +9,9 @@
 export default {
   name: 'area-select',
   props: ['coordinates', 'color', 'name', 'active'],
+  created () {
+    console.log('AreaSelect created')
+  },
   computed: {
     styleObject: function () {
       if (this.height === 0 || this.width === 0) {

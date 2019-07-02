@@ -23,6 +23,9 @@ export default {
       editing: false
     }
   },
+  created () {
+    console.log('ZoneViewer created')
+  },
   computed: {
     downloadable () {
       const blob = new Blob([this.uzn], {type: 'octet/stream'})

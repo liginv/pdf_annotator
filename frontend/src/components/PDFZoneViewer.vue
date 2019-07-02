@@ -40,6 +40,9 @@ export default {
       this.redrawUzn()
     }
   },
+  created () {
+    console.log('PDFZONe  created')
+  },
   methods: {
     startEditing () {
       this.editing = true
@@ -67,13 +70,13 @@ export default {
           this.c++
           this.obs.push({
             id: null,
-            name: s.name,
             pageno: s.coordinates.page,
             cordinates: {
-              x1: s.coordinates.left,
-              y1: Math.max(y0, y1),
-              x4: s.coordinates.left + s.coordinates.width,
-              y4: Math.min(y0, y1)
+              zname: s.name,
+              lx: s.coordinates.left,
+              ly: Math.max(y0, y1),
+              rx: s.coordinates.left + s.coordinates.width,
+              ry: Math.min(y0, y1)
             }
           })
         }
