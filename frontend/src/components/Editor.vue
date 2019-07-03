@@ -39,6 +39,7 @@ export default {
   data () {
     return {
       pid: null,
+      fl: null,
       style: [],
       old_obs: [],
       req1_stat: false,
@@ -61,18 +62,19 @@ export default {
   methods: {
     addfile (file) {
       this.file = file
+      console.log(this.file)
     },
     post () {
+
+      let formData = new FormData()
+      formData.append('pfile', this.file)
+
       if (this.change) {
         this.req1_stat = true
         // console.log(this.name)
-        this.$http.post('http://127.0.0.1:5000/post_pdf', {
-          pfile: this.file
-        }, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }).then(function (data) {
+        this.$http.post('http://127.0.0.1:8000/post_pdf', formData)
+        .then(function (data) {
+          console.log('Hmmmm')
           console.log(data)
           console.log([{
             pdf: this.file,
@@ -155,6 +157,7 @@ export default {
       } else {
         this.change = true
       }
+      this.fl = data
       this.name = data.name
       this.src = data.src
       this.arrayBuffer = data.arrayBuffer

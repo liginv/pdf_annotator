@@ -13,13 +13,17 @@ def post_pdf():
 
 	resp = Response()
 	resp.headers['Access-Control-Allow-Origin'] = '*'
-	if request.method == 'OPTIONS':
-		resp.headers['Access-Control-Allow-Headers'] = 'Content-Type'
-		resp.status_code = 204
-		resp.status = 200
-		return resp
+	#if request.method == 'OPTIONS':
+	resp.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+	resp.status_code = 204
+	#	return resp
+
+	print("\n\n")
+	print(request.form)
+	print(request.files)
+	print("\n\n")
 	#response.headers.add('Access-Control-Allow-Origin', '*')
-	pfile = request.files['pfile']
+	pfile = request.form['pfile']
 	#create a pdf instance by passing respective data
 	pdf = Pdf(pfile.filename,pfile.read())
 	#save to database
