@@ -11,8 +11,8 @@
     </div>
     <div class='content'>
       <Annotator :src="src" :setPdfSize="setPdfSize" :arrayBuffer="arrayBuffer" :name="name" :selections="selections" :addSelection="addSelection"></Annotator>
-      <div v-for="st in style" :key='st'>
-      <select name="2" id="2" :style="st">
+      <div v-for="st in style" :key="st.c">
+      <select name="2" id="2" :style="st.s">
         <option value="af">sdsdg</option>
         <option value="a">fadfa</option>
       </select>
@@ -38,7 +38,8 @@ export default {
   },
   data () {
     return {
-      pid: null,
+      c: 0,
+      pid: 1,
       style: [],
       old_obs: [],
       req1_stat: false,
@@ -61,44 +62,64 @@ export default {
   methods: {
     addfile (file) {
       this.file = file
+      console.log(file)
     },
     post () {
       if (this.change) {
+        let data = new FormData()
+        data.append('pfile', this.file)
+        // let config = {
+        //   header: {
+        //     'Content-Type': 'application/pdf'
+        //   }
+        // }
         this.req1_stat = true
         // console.log(this.name)
-        this.$http.post('http://127.0.0.1:5000/post_pdf', {
-          pfile: this.file
-        }, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }).then(function (data) {
-          console.log(data)
-          console.log([{
-            pdf: this.file,
-            name: this.name
-          }])
-          /* for (let i = 0; i < 20; i++) {
-            console.log('d')
-          } */
-          console.log('wait finished')
-          // this.obs = data
-          this.pid = data.pid
-          this.change = false
-          this.req1_stat = false
-          this.poost()
-        }).catch(function (data) {
-          console.log('From catch')
-        })
+        this.$http.post('http://127.0.0.1:5000/post_pdf',
+        data,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          // parsedData: JSON.stringify({name: 'vyshnav'})
+          }, function (data, status, request) {
+            this.postResults = data
+            this.ajaxRequest = false
+          }).then(function (data) {
+            console.log(data)
+            console.log([{
+              pdf: this.file,
+              name: this.name
+            }])
+            /* for (let i = 0; i < 20; i++) {
+              console.log('d')
+            } */
+            console.log('wait finished')
+            // this.obs = data
+            this.pid = data.pid
+            this.change = false
+            this.req1_stat = false
+            this.poost()
+          }).catch(function (data) {
+            console.log('From catch')
+          })
       }
     },
     poost () {
       this.post()
-      /* if (!this.req1_stat) {
+      if (!this.req1_stat) {
+        // let fd = new FormData()
+        // fd.append('pid', this.pid)
+        // fd.append('zones', this.obs.cordinates)
+        console.log(this.obs.cordinates)
         this.$http.post('http://127.0.0.1:5000/post_zones', {
           pid: this.pid,
-          zones: this.obs.cordinates
-        }, {'Content-Type': 'multipart/form-data'}).then(function (data) {
+          zones: this.obs
+        }, {
+          headers: {
+            'content-type': 'application/json'
+          }
+        }).then(function (data) {
           console.log(data)
           console.log(this.obs)
           console.log('finished')
@@ -107,7 +128,7 @@ export default {
           // this.obs = []
           this.selections = []
         })
-      } */
+      }
     },
     updateobj (data) {
       this.obs = data
@@ -126,7 +147,7 @@ export default {
       if (coords.height === 0 || coords.width === 0) {
         return
       }
-      console.log(coords.pageOffset)
+      // console.log(coords.pageOffset)
       this.selections.push({
         id: +new Date(),
         coordinates: {
@@ -140,11 +161,15 @@ export default {
         color: randomColor({format: 'rgb'}),
         name: 'Box' + this.selections.length
       })
+      this.c++
       this.style.push({
-        top: coords.top + coords.pageOffset.top + 'px',
-        left: coords.left + coords.pageOffset.left + 'px',
-        height: coords.height + 'px',
-        width: coords.width + 'px'
+        id: this.c,
+        s: {
+          top: coords.top + coords.pageOffset.top + 'px',
+          left: coords.left + coords.pageOffset.left + 'px',
+          height: coords.height + 'px',
+          width: coords.width + 'px'
+        }
       })
       console.log(coords.pageOffset)
       // console.log(this.selections)
@@ -155,12 +180,40 @@ export default {
       } else {
         this.change = true
       }
+      // console.log(typeof data.arrayBuffer)
       this.name = data.name
       this.src = data.src
       this.arrayBuffer = data.arrayBuffer
       this.selections = []
       this.obs = []
       this.style = []
+      this.c = 0
+      /* const { convert, extract } = require("extract-pdf-by-coordinates")
+
+      let totalConsumed = 0
+      console.log(totalconsumed)
+      convert("./resume (6).pdf")
+        .then(pages => {
+          for (const page of pages) {
+            let monthConsumption = extract(
+              page,
+              { x: 300, y: 520 }, // Start position
+              { x: 345, y: 540 } // End position
+            )
+
+            // Here we need to remove commas from the extracted value,
+            monthConsumption = monthConsumption.split(",").join("")
+            // and then convert the string to number.
+            monthConsumption = parseFloat(monthConsumption)
+
+            totalConsumed += monthConsumption
+          }
+
+          console.log(totalConsumed)
+        })
+        .catch(err => {
+          console.log(err)
+        }) */
     }
   }
 }
