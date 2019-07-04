@@ -80,6 +80,7 @@ export default {
             }
           })
         }
+        // console.log(this.obs)
         this.pr = t
         let bbox = [
           s.coordinates.left,
@@ -90,10 +91,10 @@ export default {
         let query = `LTPage[pageid=\\'${s.coordinates.page}\\'] LTTextLineHorizontal:overlaps_bbox("${bbox}")`
         return `\t('${s.name}', '${query}')`
       })
-      this.$emit('updateob', this.obs)
+      // this.$emit('updateob', this.obs)
       let pretty = lines.join(',\n')
       this.uzn = `pdf = pdfquery.PDFQuery('${this.originalFilename}')\n\npdf.extract([\n\t('with_formatter', 'text'),\n${pretty}\n])`
-      console.log(this.obs)
+      // console.log(this.obs)
     },
     changed (event) {
       console.log('CHANGED')

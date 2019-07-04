@@ -5,18 +5,22 @@
       <Uploader @addfile="addfile" :notify="newFile"></Uploader>
       <ZoneViewer :selections="selections" class='zone-viewer' :batchUpdateSelections="batchUpdateSelections" :originalFilename="name" v-if="src"></ZoneViewer>
       <PDFZoneViewer @updateob="updateobj" :dimensions="pdfDimensions" :selections="selections" class='zone-viewer' :batchUpdateSelections="batchUpdateSelections" :originalFilename="name" v-if="arrayBuffer"></PDFZoneViewer>
+      <div v-for="(i, ind) in obs" :key="ind">
+        <input type="text" :value="i.cordinates.zname" @keyup.13="edit(i,$event)">
+      </div>
       <button @click="poost">
           <center>submit</center>
         </button>
     </div>
     <div class='content'>
-      <Annotator :src="src" :setPdfSize="setPdfSize" :arrayBuffer="arrayBuffer" :name="name" :selections="selections" :addSelection="addSelection"></Annotator>
-      <div v-for="st in style" :key="st.c">
+      <Annotator :pageoffset="pageoffset" :dimensions="pdfDimensions" :obs="obs" :src="src" :setPdfSize="setPdfSize" :arrayBuffer="arrayBuffer" :name="name" :selections="selections" :addSelection="addSelection"></Annotator>
+      <!--div v-for="st in style" :key="st.c">
       <select name="2" id="2" :style="st.s">
         <option value="af">sdsdg</option>
         <option value="a">fadfa</option>
       </select>
-      </div>
+      <input type="text" value="box1" :style="{...st.s,position: absolute}">
+      </div-->
     </div>
   </div>
 </template>
@@ -38,6 +42,7 @@ export default {
   },
   data () {
     return {
+      pageoffset: null,
       c: 0,
       pid: 1,
       style: [],
@@ -60,11 +65,17 @@ export default {
     console.log('Editor created')
   },
   methods: {
+    edit (d, event) {
+      console.log(event.target.value)
+      d.cordinates.zname = event.target.value
+    },
     addfile (file) {
       this.file = file
       console.log(file)
     },
     post () {
+      let formData = new FormData()
+      formData.append('pfile', this.file)
       if (this.change) {
         let data = new FormData()
         data.append('pfile', this.file)
@@ -75,7 +86,7 @@ export default {
         // }
         this.req1_stat = true
         // console.log(this.name)
-        this.$http.post('http://127.0.0.1:5000/post_pdf',
+        this.$http.post('http://127.0.0.1:8000/post_pdf',
         data,
           {
             headers: {
@@ -112,7 +123,7 @@ export default {
         // fd.append('pid', this.pid)
         // fd.append('zones', this.obs.cordinates)
         console.log(this.obs.cordinates)
-        this.$http.post('http://127.0.0.1:5000/post_zones', {
+        this.$http.post('http://127.0.0.1:8000/post_zones', {
           pid: this.pid,
           zones: this.obs
         }, {
@@ -142,6 +153,7 @@ export default {
         width: width,
         height: height
       }
+      // console.log(width, height)
     },
     addSelection: function (coords) {
       if (coords.height === 0 || coords.width === 0) {
@@ -161,15 +173,32 @@ export default {
         color: randomColor({format: 'rgb'}),
         name: 'Box' + this.selections.length
       })
+      this.pageoffset = coords.pageOffset
+      // console.log(coords.pageOffset)
+      let y0 = parseInt(this.pdfDimensions.height - coords.top)
+      let y1 = parseInt(this.pdfDimensions.height - coords.top - coords.height)
+      this.obs = [...this.obs, {
+        pid: null,
+        cordinates: {
+          pageno: coords.page,
+          zname: 'Box' + this.selections.length,
+          lx: coords.left,
+          ly: Math.max(y0, y1),
+          rx: coords.left + coords.width,
+          ry: Math.min(y0, y1)
+        },
+        color: randomColor({format: 'rgb'})
+      }]
+      console.log(this.obs)
       this.c++
       this.style.push({
-        id: this.c,
-        s: {
-          top: coords.top + coords.pageOffset.top + 'px',
-          left: coords.left + coords.pageOffset.left + 'px',
-          height: coords.height + 'px',
-          width: coords.width + 'px'
-        }
+        id: this.c
+        // s: {
+        //   top: coords.top + coords.pageOffset.top + 'px',
+        //   left: coords.left + coords.pageOffset.left + 'px',
+        //   height: coords.height + 'px',
+        //   width: coords.width + 'px'
+        // }
       })
       console.log(coords.pageOffset)
       // console.log(this.selections)

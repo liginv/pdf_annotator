@@ -40,7 +40,7 @@ export default {
           var viewport = page.getViewport(1)
           this.setPdfSize(viewport.width, viewport.height)
           this.width = viewport.width
-          this.pdfViewer.setDocument(pdf).then(() => {
+          this.pdfViewer.setDocument(pdf).then(data => {
             window.scrollTo(0, 0)
           })
         })

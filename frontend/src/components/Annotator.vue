@@ -11,11 +11,13 @@
       <div class="area-select">
       <SelectionPreview :coordinates="coordinates" v-if="arrayBuffer"></SelectionPreview>
       <AreaSelect :coordinates="coordinates" ref="activeSelector" color="rgb(0,255,0)" active="true"></AreaSelect>
-      <AreaSelect v-for="selection in selections"
-        :key="selection.id"
-        :color="selection.color"
-        :coordinates="selection.coordinates"
-        :name="selection.name"
+      <AreaSelect v-for="(ob,ind) in obs"
+        :key="ind"
+        :color="ob.color"
+        :coordinates="ob.cordinates"
+        :name="ob.cordinates.zname"
+        :pageoffset="pageoffset"
+        :dimensions="dimensions"
       ></AreaSelect>
       <!--div v-for="coordinate in coordinates" :key='coordinate'>
       <select name="2" id="2">
@@ -32,6 +34,7 @@
 import AreaSelect from '@/components/AreaSelect'
 import PDF from '@/components/PDF'
 import SelectionPreview from '@/components/SelectionPreview'
+import randomColor from 'randomcolor'
 
 export default {
   name: 'Annotator',
@@ -42,10 +45,12 @@ export default {
   },
   created () {
     console.log('Annotator created')
+    // console.log(this.obs)
   },
-  props: ['src', 'name', 'selections', 'addSelection', 'arrayBuffer', 'setPdfSize'],
+  props: ['src', 'name', 'selections', 'addSelection', 'arrayBuffer', 'setPdfSize', 'dimensions', 'pageoffset', 'obs'],
   data () {
     return {
+      pdfsize: 'setPdfSize',
       text: '',
       down: false,
       coords: {
@@ -62,6 +67,9 @@ export default {
     }
   },
   computed: {
+    color () {
+      return randomColor({format: 'rgb'})
+    },
     coordinates () {
       return {
         left: Math.min(this.coords.xa, this.coords.xb),
