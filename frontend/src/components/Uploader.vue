@@ -56,7 +56,7 @@ export default {
       } else {
         alert('Not a PDF or image file')
       }
-      this.$emit('addfile', this.pdf)
+      this.$emit('addfile', this.pdf_file)
     },
     selected: function (event) {
       this.getFile(event.target.files)

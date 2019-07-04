@@ -69,7 +69,7 @@ export default {
         if (this.c !== this.selections.length) {
           this.c++
           this.obs.push({
-            id: null,
+            pid: this.c,
             pageno: s.coordinates.page,
             cordinates: {
               zname: s.name,
@@ -115,7 +115,7 @@ export default {
           selection.name = elements[1]
           selection.page = elements[2]
           index++
-          // console.log(selection)
+          //  console.log(selection)
           return selection
         } catch (err) {
           console.log(err)

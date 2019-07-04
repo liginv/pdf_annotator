@@ -8,9 +8,10 @@ import json
 def home():
 	return render_template('index.html')
 
-@app.route('/post_pdf', methods=['POST','OPTIONS'])
+@app.route('/post_pdf', methods=['POST'])
 def post_pdf():
 
+<<<<<<< HEAD
 	resp = Response()
 	resp.headers['Access-Control-Allow-Origin'] = '*'
 	#if request.method == 'OPTIONS':
@@ -24,6 +25,13 @@ def post_pdf():
 	print("\n\n")
 	#response.headers.add('Access-Control-Allow-Origin', '*')
 	pfile = request.form['pfile']
+=======
+	print("\n\n")
+	print(request.files)
+	print("\n\n")
+
+	pfile = request.files['pfile']
+>>>>>>> 73cbe74d57d1b4f7a6885f3d3912f03ba71e5d6f
 	#create a pdf instance by passing respective data
 	pdf = Pdf(pfile.filename,pfile.read())
 	#save to database
@@ -49,18 +57,37 @@ def put_zones():
 
 @app.route('/post_zones', methods=['POST'])
 def post_zones():
-	resp = Response()
-	resp.headers['Access-Control-Allow-Origin'] = '*'
+	print(request.get_json())
+	res = Response()
+	res.headers = {
+		'Accept': 'application/json',
+		'Content-Type': 'application/json',
+		'Access-Control-Allow-Headers': 'Content-Type',
+		'Access-Control-Allow-Methods': 'POST, OPTIONS',
+		'Access-Control-Allow-Origin': '*'
+	}
+	#resp = Response()
+	#resp.headers['Access-Control-Allow-Origin'] = '*'
 	#response.headers.add('Access-Control-Allow-Origin', '*')
 	zones = request.json['zones']
+	print(zones)
 	output = []
+	pid=0
 	for zone_obj in zones:
-		zone = Zone(zone_obj.get('zname'),zone_obj.get('lx'),zone_obj.get('ly'),zone_obj.get('rx'),zone_obj.get('ry'))
+		pid=pid+1
+		zone = Zone(zone_obj['cordinates']['zname'],zone_obj['cordinates']['lx'],zone_obj['cordinates']['ly'],zone_obj['cordinates']['rx'],zone_obj['cordinates']['ry'])
 		zone.pid = pid
 		db.session.add(zone)
 		db.session.commit()
 		output.append(zone)
 	result = zones_schema.dump(output)
+	jsonify(result.data)
+
+	print(request.json)
+
+	res.response = {
+		'status': 200
+	}
 	return jsonify(result.data)
 
 
