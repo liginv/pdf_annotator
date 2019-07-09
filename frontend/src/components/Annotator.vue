@@ -9,16 +9,29 @@
       <img :src="src" v-if="src">
       <PDF :setPdfSize="setPdfSize" :arrayBuffer="arrayBuffer" v-if="arrayBuffer"></PDF>
       <div class="area-select">
-      <SelectionPreview :coordinates="coordinates" v-if="arrayBuffer"></SelectionPreview>
-      <AreaSelect :coordinates="coordinates" ref="activeSelector" color="rgb(0,255,0)" active="true"></AreaSelect>
+      <SelectionPreview @zname="znamech" :coordinates="coordinates" v-if="arrayBuffer"></SelectionPreview>
+      <AreaSelect :fill="fill" :coordinates="coordinates" ref="activeSelector" color="rgb(0,255,0)" active="true"></AreaSelect>
+      <div v-if="fill === false">
       <AreaSelect v-for="(ob,ind) in obs"
-        :key="ind"
-        :color="ob.color"
-        :coordinates="ob.cordinates"
-        :name="ob.cordinates.zname"
+        :key="old_obs.length + ind"
+        :coordinates="ob"
+        :name="ob.zname"
+        :pageoffset="ob.pageOffset"
+        :dimensions="dimensions"
+        :fill="false"
+        :entry="entry"
+      ></AreaSelect>
+      </div>
+      <AreaSelect v-for="(old_ob,o_ind) in old_obs"
+        :key="o_ind"
+        :keyid="o_ind"
+        :coordinates="old_ob.cordinates"
+        :name="old_ob.zname"
         :pageoffset="pageoffset"
         :dimensions="dimensions"
-      ></AreaSelect>
+        :fill="fill"
+        :entry="entry"
+      >{{this.o_ind}}</AreaSelect>
       <!--div v-for="coordinate in coordinates" :key='coordinate'>
       <select name="2" id="2">
         <option value="af">sdsdg</option>
@@ -35,6 +48,7 @@ import AreaSelect from '@/components/AreaSelect'
 import PDF from '@/components/PDF'
 import SelectionPreview from '@/components/SelectionPreview'
 import randomColor from 'randomcolor'
+// import * as JsPDF from 'jspdf'
 
 export default {
   name: 'Annotator',
@@ -45,9 +59,26 @@ export default {
   },
   created () {
     console.log('Annotator created')
-    // console.log(this.obs)
+    console.log(this.dimensions)
   },
-  props: ['src', 'name', 'selections', 'addSelection', 'arrayBuffer', 'setPdfSize', 'dimensions', 'pageoffset', 'obs'],
+  updated () {
+    // var doc = new JsPDF()
+    // var elementHandler = {
+    //   '#ignorePDF': function (element, renderer) {
+    //     return true
+    //   }
+    // }
+    // var source = window.document.getElementsByTagName('span')[0]
+    // doc.fromHTML(
+    //   source,
+    //   15,
+    //   15,
+    //   {
+    //     'width': 180, 'elementHandlers': elementHandler
+    //   })
+    // doc.output('dataurlnewwindow')
+  },
+  props: ['src', 'name', 'selections', 'addSelection', 'arrayBuffer', 'setPdfSize', 'dimensions', 'pageoffset', 'obs', 'old_obs', 'fill', 'entry'],
   data () {
     return {
       pdfsize: 'setPdfSize',
@@ -85,6 +116,9 @@ export default {
     }
   },
   methods: {
+    znamech (data) {
+      this.$emit('zname', data)
+    },
     reset: function () {
       this.coords.xa = null
       this.coords.ya = null
@@ -108,8 +142,10 @@ export default {
       event.stopPropagation()
       event.preventDefault()
       this.down = false
-      this.addSelection(this.coordinates)
-      this.reset()
+      if (this.fill === false) {
+        this.addSelection(this.coordinates)
+        this.reset()
+      }
       // console.log(this.text)
     },
     drag: function (event) {

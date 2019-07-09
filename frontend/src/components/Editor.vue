@@ -5,23 +5,50 @@
       <Uploader @addfile="addfile" :notify="newFile"></Uploader>
       <ZoneViewer :selections="selections" class='zone-viewer' :batchUpdateSelections="batchUpdateSelections" :originalFilename="name" v-if="src"></ZoneViewer>
       <PDFZoneViewer @updateob="updateobj" :dimensions="pdfDimensions" :selections="selections" class='zone-viewer' :batchUpdateSelections="batchUpdateSelections" :originalFilename="name" v-if="arrayBuffer"></PDFZoneViewer>
-      <div v-for="(i, ind) in obs" :key="ind">
-        <input type="text" :value="i.cordinates.zname" @keyup.13="edit(i,$event)">
+      <div v-if="fill === false">
+        <div v-for="(o_i, o_ind) in old_obs" :key="o_ind">
+          <div v-if="o_ind ===  o_editid">
+            <input type="text" :value="o_i.cordinates.zname" @keyup.13="o_edit(o_i,$event)">
+          </div>
+          <div v-else>
+            {{ o_i.cordinates.zname }}
+            <div v-if="o_ind === change_an && change_st">
+              {{ f_change_an(o_i) }}
+            </div>
+            <button @click="o_editid = o_ind">edit</button>
+            <button @click="o_del(o_ind)">x</button>
+            <button @click="change_an = o_ind">change</button>
+          </div>
+        </div>
+        <div v-for="(i, ind) in obs" :key="old_obs.length + ind">
+          <input type="text" :value="i.cordinates.zname" @keyup.13="edit(i,$event)">
+          <button @click="del(ind)">x</button>
+        </div>
+        <div>
+          <button @click="poost">
+            <center>submit</center>
+          </button> 
+        </div>
+          <button @click="fill = true">
+            <center>fill</center>
+          </button> 
       </div>
-      <button @click="poost">
-          <center>submit</center>
-        </button>
+      <div v-else>
+        <button @click="fill = false">
+            <center>back</center>
+        </button> 
+      </div>
     </div>
-    <div class='content'>
-      <Annotator :pageoffset="pageoffset" :dimensions="pdfDimensions" :obs="obs" :src="src" :setPdfSize="setPdfSize" :arrayBuffer="arrayBuffer" :name="name" :selections="selections" :addSelection="addSelection"></Annotator>
-      <!--div v-for="st in style" :key="st.c">
-      <select name="2" id="2" :style="st.s">
-        <option value="af">sdsdg</option>
-        <option value="a">fadfa</option>
-      </select>
-      <input type="text" value="box1" :style="{...st.s,position: absolute}">
-      </div-->
-    </div>
+      <div class='content'>
+        <Annotator @zname="znamech" :entry="entry" :fill="fill" :old_obs="old_obs" :pageoffset="pageoffset" :dimensions="pdfDimensions" :obs="obs" :src="src" :setPdfSize="setPdfSize" :arrayBuffer="arrayBuffer" :name="name" :selections="selections" :addSelection="addSelection"></Annotator>
+        <!--div v-for="st in style" :key="st.c">
+        <select name="2" id="2" :style="st.s">
+          <option value="af">sdsdg</option>
+          <option value="a">fadfa</option>
+        </select>
+        <input type="text" value="box1" :style="{...st.s,position: absolute}">
+        </div-->
+      </div>
   </div>
 </template>
 
@@ -42,6 +69,16 @@ export default {
   },
   data () {
     return {
+      del_obs: [],
+      ed_obs: [],
+      zname: '',
+      entry: ['mohamed zameel', 'ponnath [h]', 'pathazhakad', 'kodungallur', 'trissur'],
+      fill: false,
+      change_st: false,
+      ch_cordinates: null,
+      change_an: null,
+      editid: null,
+      o_editid: null,
       pageoffset: null,
       c: 0,
       pid: 1,
@@ -65,9 +102,42 @@ export default {
     console.log('Editor created')
   },
   methods: {
+    znamech (data) {
+      this.zname = data
+    },
+    f_change_an (d) {
+      this.ch_cordinates.zname = d.zname
+      d.cordinates = this.ch_cordinates
+      let n = this.ed_obs.find(x => x.id === d.id)
+      if (!n) {
+        this.ed_obs = [...this.ed_obs, d]
+      }
+      this.change_an = null
+      this.ch_cordinates = null
+    },
+    del (i) {
+      this.obs.splice(i, 1)
+      console.log(this.obs)
+    },
+    o_del (i) {
+      let del = this.old_obs.splice(i, 1)
+      this.del_obs = [...this.del_obs, del]
+      console.log(this.old_obs)
+    },
+    o_edit (d, event) {
+      console.log(event.target.value)
+      d.zname = event.target.value
+      let n = this.ed_obs.find(x => x.id === d.id)
+      if (!n) {
+        // n.cordinates.zname = event.target.value
+        this.ed_obs = [...this.ed_obs, d]
+      }
+      console.log(this.ed_obs)
+      this.o_editid = null
+    },
     edit (d, event) {
       console.log(event.target.value)
-      d.cordinates.zname = event.target.value
+      d.zname = event.target.value
     },
     addfile (file) {
       this.file = file
@@ -122,23 +192,56 @@ export default {
         // let fd = new FormData()
         // fd.append('pid', this.pid)
         // fd.append('zones', this.obs.cordinates)
-        console.log(this.obs.cordinates)
-        this.$http.post('http://127.0.0.1:8000/post_zones', {
-          pid: this.pid,
-          zones: this.obs
-        }, {
-          headers: {
-            'content-type': 'application/json'
-          }
-        }).then(function (data) {
-          console.log(data)
-          console.log(this.obs)
-          console.log('finished')
-          // for (data )
-          // this.old_obs = data
-          // this.obs = []
-          this.selections = []
-        })
+        // console.log(this.obs.cordinates)
+        if (this.obs !== []) {
+          this.$http.post('http://127.0.0.1:8000/post_zones', {
+            pid: this.pid,
+            zones: this.obs
+          }, {
+            headers: {
+              'content-type': 'application/json'
+            }
+          }).then(function (data) {
+            console.log(data)
+            console.log(this.obs)
+            console.log('finished')
+            // for (data )
+            // this.old_obs = data
+            // this.obs = []
+            this.old_obs = [...this.old_obs, ...this.obs]
+            this.obs = []
+          })
+        }
+        if (this.ed_obs !== []) {
+          this.$http.post('http://127.0.0.1:8000/put_zones', this.ed_obs, {
+            headers: {
+              'content-type': 'application/json'
+            }
+          }).then(function (data) {
+            console.log(data)
+            console.log(this.obs)
+            console.log('edit finished')
+            // for (data )
+            // this.old_obs = data
+            // this.obs = []
+            this.ed_obs = []
+          })
+        }
+        if (this.del_obs) {
+          this.$http.post('http://127.0.0.1:8000/delete_zones', this.del_obs, {
+            headers: {
+              'content-type': 'application/json'
+            }
+          }).then(function (data) {
+            console.log(data)
+            console.log(this.obs)
+            console.log('delete finished')
+            // for (data )
+            // this.old_obs = data
+            // this.obs = []
+            this.del_obs = []
+          })
+        }
       }
     },
     updateobj (data) {
@@ -160,47 +263,69 @@ export default {
         return
       }
       // console.log(coords.pageOffset)
-      this.selections.push({
-        id: +new Date(),
-        coordinates: {
+      // let y0 = parseInt(this.pdfDimensions.height - coords.top)
+      // let y1 = parseInt(this.pdfDimensions.height - coords.top - coords.height)
+      if (this.change_an === null) {
+        this.selections.push({
+          id: +new Date(),
+          coordinates: {
+            top: coords.top,
+            left: coords.left,
+            height: coords.height,
+            width: coords.width,
+            page: coords.page,
+            pageOffset: coords.pageOffset
+          },
+          color: randomColor({format: 'rgb'}),
+          name: 'Box' + this.selections.length
+        })
+        this.pageoffset = coords.pageOffset
+        // console.log(coords.pageOffset)
+        this.obs = [...this.obs, {
+          pid: null,
+          pageno: coords.page,
+          zname: this.zname,
+          // lx: coords.left,
+          // ly: Math.max(y0, y1),
+          // rx: coords.left + coords.width,
+          // ry: Math.min(y0, y1)
           top: coords.top,
           left: coords.left,
           height: coords.height,
           width: coords.width,
           page: coords.page,
           pageOffset: coords.pageOffset
-        },
-        color: randomColor({format: 'rgb'}),
-        name: 'Box' + this.selections.length
-      })
-      this.pageoffset = coords.pageOffset
-      // console.log(coords.pageOffset)
-      let y0 = parseInt(this.pdfDimensions.height - coords.top)
-      let y1 = parseInt(this.pdfDimensions.height - coords.top - coords.height)
-      this.obs = [...this.obs, {
-        pid: null,
-        cordinates: {
+          // color: randomColor({format: 'rgb'})
+        }]
+        // console.log(this.obs[0].cordinates)
+        this.c++
+        this.style.push({
+          id: this.c
+          // s: {
+          //   top: coords.top + coords.pageOffset.top + 'px',
+          //   left: coords.left + coords.pageOffset.left + 'px',
+          //   height: coords.height + 'px',
+          //   width: coords.width + 'px'
+          // }
+        })
+      } else {
+        this.ch_cordinates = {
           pageno: coords.page,
-          zname: 'Box' + this.selections.length,
-          lx: coords.left,
-          ly: Math.max(y0, y1),
-          rx: coords.left + coords.width,
-          ry: Math.min(y0, y1)
-        },
-        color: randomColor({format: 'rgb'})
-      }]
-      console.log(this.obs)
-      this.c++
-      this.style.push({
-        id: this.c
-        // s: {
-        //   top: coords.top + coords.pageOffset.top + 'px',
-        //   left: coords.left + coords.pageOffset.left + 'px',
-        //   height: coords.height + 'px',
-        //   width: coords.width + 'px'
-        // }
-      })
-      console.log(coords.pageOffset)
+          zname: this.zname,
+          // lx: coords.left,
+          // ly: Math.max(y0, y1),
+          // rx: coords.left + coords.width,
+          // ry: Math.min(y0, y1)
+          top: coords.top,
+          left: coords.left,
+          height: coords.height,
+          width: coords.width,
+          page: coords.page,
+          pageOffset: coords.pageOffset
+        }
+        this.change_st = true
+      }
+      // console.log(coords.pageOffset)
       // console.log(this.selections)
     },
     newFile: function (data) {

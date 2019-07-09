@@ -20,6 +20,8 @@ class Zone(db.Model):
 	ly = db.Column(db.Integer, nullable=False)
 	rx = db.Column(db.Integer, nullable=False)
 	ry = db.Column(db.Integer, nullable=False)
+	offset = db.Column(db.Integer, nullable=False)
+	pageno = db.Column(db.Integer)
 	pid = db.Column(db.Integer, db.ForeignKey('pdf.pid'), nullable=False)
 
 	def __init__(self,name,lx,ly,rx,ry):

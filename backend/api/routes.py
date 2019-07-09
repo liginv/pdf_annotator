@@ -59,7 +59,7 @@ def post_zones():
 	pid=0
 	for zone_obj in zones:
 		pid=pid+1
-		zone = Zone(zone_obj['cordinates']['zname'],zone_obj['cordinates']['lx'],zone_obj['cordinates']['ly'],zone_obj['cordinates']['rx'],zone_obj['cordinates']['ry'])
+		zone = Zone(zone_obj['cordinates']['zname'],zone_obj['cordinates']['left'],zone_obj['cordinates']['top'],zone_obj['cordinates']['width'],zone_obj['cordinates']['height'])
 		zone.pid = pid
 		db.session.add(zone)
 		db.session.commit()
