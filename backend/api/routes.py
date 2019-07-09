@@ -10,8 +10,6 @@ def home():
 
 @app.route('/post_pdf', methods=['POST'])
 def post_pdf():
-
-<<<<<<< HEAD
 	resp = Response()
 	resp.headers['Access-Control-Allow-Origin'] = '*'
 	#if request.method == 'OPTIONS':
@@ -25,13 +23,6 @@ def post_pdf():
 	print("\n\n")
 	#response.headers.add('Access-Control-Allow-Origin', '*')
 	pfile = request.form['pfile']
-=======
-	print("\n\n")
-	print(request.files)
-	print("\n\n")
-
-	pfile = request.files['pfile']
->>>>>>> 73cbe74d57d1b4f7a6885f3d3912f03ba71e5d6f
 	#create a pdf instance by passing respective data
 	pdf = Pdf(pfile.filename,pfile.read())
 	#save to database
