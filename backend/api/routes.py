@@ -1,7 +1,7 @@
 from api.models import Pdf, Zone
 from flask import request, Response, jsonify, render_template
 from api import app, db
-from api.schema import zone_schema, pdf_schema, zones_schema
+from api.schema import zone_schema, pdf_schema, zones_schema, pdfs_schema
 import json
 
 @app.route('/', methods=['GET'])
@@ -10,28 +10,12 @@ def home():
 
 @app.route('/post_pdf', methods=['POST'])
 def post_pdf():
-
-<<<<<<< HEAD
 	resp = Response()
 	resp.headers['Access-Control-Allow-Origin'] = '*'
-	#if request.method == 'OPTIONS':
 	resp.headers['Access-Control-Allow-Headers'] = 'Content-Type'
 	resp.status_code = 204
-	#	return resp
-
-	print("\n\n")
-	print(request.form)
-	print(request.files)
-	print("\n\n")
 	#response.headers.add('Access-Control-Allow-Origin', '*')
 	pfile = request.form['pfile']
-=======
-	print("\n\n")
-	print(request.files)
-	print("\n\n")
-
-	pfile = request.files['pfile']
->>>>>>> 73cbe74d57d1b4f7a6885f3d3912f03ba71e5d6f
 	#create a pdf instance by passing respective data
 	pdf = Pdf(pfile.filename,pfile.read())
 	#save to database
@@ -66,9 +50,6 @@ def post_zones():
 		'Access-Control-Allow-Methods': 'POST, OPTIONS',
 		'Access-Control-Allow-Origin': '*'
 	}
-	#resp = Response()
-	#resp.headers['Access-Control-Allow-Origin'] = '*'
-	#response.headers.add('Access-Control-Allow-Origin', '*')
 	zones = request.json['zones']
 	print(zones)
 	output = []
@@ -103,6 +84,36 @@ def delete_zones():
 	result = zones_schema.dump(output)
 	return jsonify(result.data)
 
+@app.route('/get_pdfs')
+def get_pdfs():
+	pdfs = pdfs_schema.dump(Pdf.query.all())
+	return jsonify(pdfs.data)
 
+@app.route('/get_zones')
+def get_zones():
+	zones = zones_schema.dump(Zone.query.all())
+	return jsonify(zones.data)
+
+@app.route('/get_pdf/<int:pdf_id>')
+def get_pdf(pdf_id):
+	pdf = Pdf.query.get(pdf_id)
+	zones = pdf.zones
+	output = {}
+	output["pid"] = pdf.pid
+	output["pname"] = pdf.pname
+
+	zoneArr = []
+	for zone in  zones:
+		zoneObj = {}
+		zoneObj["zid"] = zone.zid
+		zoneObj["zname"] = zone.zname
+		zoneObj["lx"] = zone.lx
+		zoneObj["ly"] = zone.ly
+		zoneObj["rx"] = zone.rx
+		zoneObj["ry"] = zone.ry
+		zoneArr.append(zoneObj)
+
+	output["zones"] = zoneArr
+	return json.dumps(output)
 
 
