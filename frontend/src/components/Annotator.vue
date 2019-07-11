@@ -7,16 +7,17 @@
     <!-- <p>If you want to zoom in/out, you'll need to use your browser zoom for the moment.</p> -->
     <div class='selection-area' @mousedown="start" @mouseup="end" @mousemove="drag" v-if="src || arrayBuffer" ref="selectionArea">
       <img :src="src" v-if="src">
-      <PDF :setPdfSize="setPdfSize" :arrayBuffer="arrayBuffer" v-if="arrayBuffer"></PDF>
+      <PDF @get="getcan" :getcan="getcan" :setPdfSize="setPdfSize" :arrayBuffer="arrayBuffer" v-if="arrayBuffer"></PDF>
       <div class="area-select">
-      <SelectionPreview @zname="znamech" :coordinates="coordinates" v-if="arrayBuffer"></SelectionPreview>
+      <SelectionPreview :znamech="znamech" :coordinates="coordinates" v-if="arrayBuffer"></SelectionPreview>
       <AreaSelect :fill="fill" :coordinates="coordinates" ref="activeSelector" color="rgb(0,255,0)" active="true"></AreaSelect>
       <div v-if="fill === false">
       <AreaSelect v-for="(ob,ind) in obs"
         :key="old_obs.length + ind"
         :coordinates="ob"
         :name="ob.zname"
-        :pageoffset="ob.pageOffset"
+        :pageOffset_top="ob.pageOffset_top"
+        :pageOffset_left="ob.pageOffset_left"
         :dimensions="dimensions"
         :fill="false"
         :entry="entry"
@@ -25,9 +26,10 @@
       <AreaSelect v-for="(old_ob,o_ind) in old_obs"
         :key="o_ind"
         :keyid="o_ind"
-        :coordinates="old_ob.cordinates"
+        :coordinates="old_ob"
         :name="old_ob.zname"
-        :pageoffset="pageoffset"
+        :pageOffset_top="old_ob.pageOffset_top"
+        :pageOffset_left="old_ob.pageOffset_left"
         :dimensions="dimensions"
         :fill="fill"
         :entry="entry"
@@ -78,7 +80,7 @@ export default {
     //   })
     // doc.output('dataurlnewwindow')
   },
-  props: ['src', 'name', 'selections', 'addSelection', 'arrayBuffer', 'setPdfSize', 'dimensions', 'pageoffset', 'obs', 'old_obs', 'fill', 'entry'],
+  props: ['src', 'name', 'selections', 'addSelection', 'arrayBuffer', 'setPdfSize', 'dimensions', 'pageoffset', 'obs', 'old_obs', 'fill', 'entry', 'znamech', 'getcan'],
   data () {
     return {
       pdfsize: 'setPdfSize',
@@ -108,17 +110,15 @@ export default {
         width: Math.abs(this.coords.xa - this.coords.xb),
         height: Math.abs(this.coords.ya - this.coords.yb),
         page: this.pageNumber,
-        pageOffset: {
-          top: this.pageOffset.top,
-          left: this.pageOffset.left
-        }
+        pageOffset_top: this.pageOffset.top,
+        pageOffset_left: this.pageOffset.left
       }
     }
   },
   methods: {
-    znamech (data) {
-      this.$emit('zname', data)
-    },
+    // znamech (data) {
+    //   this.$emit('zname', data)
+    // },
     reset: function () {
       this.coords.xa = null
       this.coords.ya = null

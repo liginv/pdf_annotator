@@ -5,7 +5,7 @@ ma = Marshmallow(app)
 
 class ZoneSchema(ma.Schema):
 	class Meta:
-		fields = ('zid','zname','lx','ly','rx','ry')
+		fields = ('zid','zname','left','top','width','height','pageOffset_left','pageOffset_top','pageno','canvas_width','canvas_height')
 
 class PdfSchema(ma.Schema):
 	class Meta:

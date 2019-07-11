@@ -30,10 +30,15 @@ def put_zones():
 	for zone_obj in zones:
 		zone = Zone.query.get(zone_obj.get('zid'))
 		zone.zname = zone_obj.get('zname')
-		zone.lx = zone_obj.get('lx')
-		zone.ly = zone_obj.get('ly')
-		zone.rx = zone_obj.get('rx')
-		zone.ry = zone_obj.get('ry')
+		zone.left = zone_obj.get('left')
+		zone.top = zone_obj.get('top')
+		zone.width = zone_obj.get('width')
+		zone.heigth = zone_obj.get('height')
+		zone.pageOffset_left = zone_obj.get('pageOffset_left')
+		zone.pageOffset_top = zone_obj.get('pageOffset_top')
+		zone.pageno = zone_obj.get('pageno')
+		zone.canvas_width = zone_obj.get('canvas_width')
+		zone.canvas_height = zone_obj.get('canvas_height')
 		db.session.commit()
 		output.append(zone)
 	result = zones_schema.dump(output)
@@ -56,11 +61,9 @@ def post_zones():
 	zones = request.json['zones']
 	print(zones)
 	output = []
-	pid=0
 	for zone_obj in zones:
-		pid=pid+1
-		zone = Zone(zone_obj['cordinates']['zname'],zone_obj['cordinates']['left'],zone_obj['cordinates']['top'],zone_obj['cordinates']['width'],zone_obj['cordinates']['height'])
-		zone.pid = pid
+		zone = Zone(zone_obj['zname'],zone_obj['left'],zone_obj['top'],zone_obj['width'],zone_obj['height'],zone_obj['pageOffset_left'],zone_obj['pageOffset_top'],zone_obj['pageno'],zone_obj['canvas_width'],zone_obj['canvas_height'])
+		zone.pid = request.json['pid']
 		db.session.add(zone)
 		db.session.commit()
 		output.append(zone)
@@ -77,15 +80,19 @@ def post_zones():
 
 @app.route('/delete_zones', methods=['DELETE'])
 def delete_zones():
-	zones = request.json['zones']
+	zids = request.json['zids']
 	output = []
-	for zone_obj in zones:
-		zone = Zone.query.get(zone_obj.get('zid'))
+	print(request.json)
+	for zid in zids:
+		zone = Zone.query.get(zid)
 		db.session.delete(zone)
 		db.session.commit()
 		output.append(zone)
 	result = zones_schema.dump(output)
-	return jsonify(result.data)
+	# res.response = {
+	# 	'status': 200
+	# }
+	return  jsonify(result.data)
 
 
 

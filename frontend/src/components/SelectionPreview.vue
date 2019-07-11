@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  props: ['coordinates'],
+  props: ['coordinates', 'znamech'],
   created () {
     console.log('selectionpreviewcreated')
   },
@@ -20,7 +20,8 @@ export default {
     if (this.text === null) {
       this.text = ''
     }
-    this.$emit('zname', this.text)
+    // this.$emit('zname', this.text)
+    this.znamech(this.text)
   },
   watch: {
     coordinates () {

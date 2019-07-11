@@ -17,12 +17,14 @@ import randomColor from 'randomcolor'
 
 export default {
   name: 'area-select',
-  props: ['coordinates', 'name', 'active', 'dimensions', 'pageoffset', 'fill', 'entry', 'keyid'],
+  props: ['coordinates', 'name', 'active', 'dimensions', 'pageoffset_top', 'pageoffset_left', 'fill', 'entry', 'keyid'],
   created () {
     // console.log(this.entry)
     // console.log(this.keyid)
     // textFit(document.getElementsByClassName('selection-box'))
     console.log('AreaSelect created')
+    console.log(this.fill, this.coordinates, this.coordinates.left)
+    console.log(this.coordinates.pageOffset_left)
     // console.log({offset: this.pageoffset})
     // console.log(this.coordinates.lx)
     // console.log(this.coordinates.zname)
@@ -56,8 +58,8 @@ export default {
           // top: this.dimensions.height - this.coordinates.ly + this.pageoffset.top - 3 + 'px',
           // width: this.coordinates.rx - this.coordinates.lx + 'px',
           // height: this.coordinates.ly - this.coordinates.ry + 'px',
-          left: this.coordinates.left + this.coordinates.pageOffset.left + 'px',
-          top: this.coordinates.top + this.coordinates.pageOffset.top - 3 + 'px',
+          left: this.coordinates.left + this.coordinates.pageOffset_left + 'px',
+          top: this.coordinates.top + this.coordinates.pageOffset_top - 3 + 'px',
           width: this.coordinates.width + 'px',
           height: this.coordinates.height + 'px',
           border: 'solid ' + this.color + ' 1px',
@@ -69,8 +71,8 @@ export default {
           // top: this.dimensions.height - this.coordinates.ly + this.pageoffset.top - 5 + 'px',
           // width: this.coordinates.rx - this.coordinates.lx + 'px',
           // height: this.coordinates.ly - this.coordinates.ry + 'px',
-          left: this.coordinates.left + this.coordinates.pageOffset.left + 'px',
-          top: this.coordinates.top + this.coordinates.pageOffset.top - 5 + 'px',
+          left: this.coordinates.left + this.coordinates.pageOffset_left + 'px',
+          top: this.coordinates.top + this.coordinates.pageOffset_top - 5 + 'px',
           width: this.coordinates.width + 'px',
           height: this.coordinates.height + 'px',
           opacity: 1
