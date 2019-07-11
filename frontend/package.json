@@ -14,7 +14,6 @@
   },
   "dependencies": {
     "extract-pdf-by-coordinates": "^1.0.4",
-    "pdf.js-extract": "file://node_modules/pdf.js-extract",
     "pdfjs-dist": "^1.8.524",
     "randomcolor": "^0.5.3",
     "vue": "^2.3.3",

@@ -49,7 +49,10 @@ def gen_pdf(pid):
 		for zone in currPage:
 			hr = height/zone.canvas_height
 			wr = width/zone.canvas_width
-			can.drawString(0.5*wr+zone.lx*wr,height - zone.ly*hr-10*hr,zone.zname)
+
+			print(0.5*wr+zone.left*wr,height - zone.top*hr-10*hr,zone.zname)
+
+			can.drawString(0.5*wr+zone.left*wr,height - zone.top*hr-10*hr,zone.zname)
 
 		can.save()
 
