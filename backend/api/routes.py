@@ -10,11 +10,6 @@ def home():
 
 @app.route('/post_pdf', methods=['POST'])
 def post_pdf():
-
-	print("\n\n")
-	print(request.files)
-	print("\n\n")
-
 	pfile = request.files['pfile']
 	#create a pdf instance by passing respective data
 	pdf = Pdf(pfile.filename,pfile.read())
@@ -46,7 +41,7 @@ def put_zones():
 
 @app.route('/post_zones', methods=['POST'])
 def post_zones():
-	#print(request.get_json())
+	
 	res = Response()
 	res.headers = {
 		'Accept': 'application/json',
@@ -58,8 +53,6 @@ def post_zones():
 
 	pid = request.json['pid']
 	zones = request.json['zones']
-
-	print(pid,zones)
 
 	output = []
 	for zone_obj in zones:
@@ -81,16 +74,14 @@ def post_zones():
 def delete_zones():
 	zids = request.json['zids']
 	output = []
-	print(request.json)
+	
 	for zid in zids:
 		zone = Zone.query.get(zid)
 		db.session.delete(zone)
 		db.session.commit()
 		output.append(zone)
 	result = zones_schema.dump(output)
-	# res.response = {
-	# 	'status': 200
-	# }
+
 	return  jsonify(result.data)
 
 @app.route('/get_pdfs')
@@ -116,13 +107,15 @@ def get_pdf(pdf_id):
 		zoneObj = {}
 		zoneObj["zid"] = zone.zid
 		zoneObj["zname"] = zone.zname
-		zoneObj["lx"] = zone.lx
-		zoneObj["ly"] = zone.ly
-		zoneObj["rx"] = zone.rx
-		zoneObj["ry"] = zone.ry
-		zoneObj["page"] = zone.page
-		zoneObj["page_height"] = zone.page_height
-		zoneObj["page_width"] = zone.page_width
+		zoneObj["left"] = zone.left
+		zoneObj["top"] = zone.top
+		zoneObj["width"] = zone.width
+		zoneObj["height"] = zone.height
+		zoneObj["pageOffset_left"] = zone.pageOffset_left
+		zoneObj["pageOffset_top"] = zone.pageOffset_top
+		zoneObj["pageno"] = zone.pageno
+		zoneObj["canvas_width"] = zone.canvas_width
+		zoneObj["canvas_height"] = zone.canvas_height
 		zoneArr.append(zoneObj)
 
 	output["zones"] = zoneArr
@@ -134,6 +127,5 @@ from .pdf_maker import *
 def gen_pdf_func(pid):
 	gen_pdf(pid)
 	return jsonify({
-			'status': 200,
-			'created': 201
+			'status': 200
 		})
