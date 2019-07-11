@@ -14,3 +14,4 @@ class PdfSchema(ma.Schema):
 zone_schema = ZoneSchema(strict=True)
 zones_schema = ZoneSchema(many=True,strict=True)
 pdf_schema = PdfSchema(strict=True)
+pdfs_schema = PdfSchema(many=True,strict=True)

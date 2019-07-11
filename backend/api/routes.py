@@ -1,7 +1,7 @@
 from api.models import Pdf, Zone
 from flask import request, Response, jsonify, render_template
 from api import app, db
-from api.schema import zone_schema, pdf_schema, zones_schema
+from api.schema import zone_schema, pdf_schema, zones_schema, pdfs_schema
 import json
 
 @app.route('/', methods=['GET'])
@@ -46,7 +46,7 @@ def put_zones():
 
 @app.route('/post_zones', methods=['POST'])
 def post_zones():
-	print(request.get_json())
+	#print(request.get_json())
 	res = Response()
 	res.headers = {
 		'Accept': 'application/json',
@@ -55,11 +55,12 @@ def post_zones():
 		'Access-Control-Allow-Methods': 'POST, OPTIONS',
 		'Access-Control-Allow-Origin': '*'
 	}
-	#resp = Response()
-	#resp.headers['Access-Control-Allow-Origin'] = '*'
-	#response.headers.add('Access-Control-Allow-Origin', '*')
+
+	pid = request.json['pid']
 	zones = request.json['zones']
-	print(zones)
+
+	print(pid,zones)
+
 	output = []
 	for zone_obj in zones:
 		zone = Zone(zone_obj['zname'],zone_obj['left'],zone_obj['top'],zone_obj['width'],zone_obj['height'],zone_obj['pageOffset_left'],zone_obj['pageOffset_top'],zone_obj['pageno'],zone_obj['canvas_width'],zone_obj['canvas_height'])
@@ -67,10 +68,8 @@ def post_zones():
 		db.session.add(zone)
 		db.session.commit()
 		output.append(zone)
+	
 	result = zones_schema.dump(output)
-	jsonify(result.data)
-
-	print(request.json)
 
 	res.response = {
 		'status': 200
@@ -94,6 +93,47 @@ def delete_zones():
 	# }
 	return  jsonify(result.data)
 
+@app.route('/get_pdfs')
+def get_pdfs():
+	pdfs = pdfs_schema.dump(Pdf.query.all())
+	return jsonify(pdfs.data)
 
+@app.route('/get_zones')
+def get_zones():
+	zones = zones_schema.dump(Zone.query.all())
+	return jsonify(zones.data)
 
+@app.route('/get_pdf/<int:pdf_id>')
+def get_pdf(pdf_id):
+	pdf = Pdf.query.get(pdf_id)
+	zones = pdf.zones
+	output = {}
+	output["pid"] = pdf.pid
+	output["pname"] = pdf.pname
 
+	zoneArr = []
+	for zone in  zones:
+		zoneObj = {}
+		zoneObj["zid"] = zone.zid
+		zoneObj["zname"] = zone.zname
+		zoneObj["lx"] = zone.lx
+		zoneObj["ly"] = zone.ly
+		zoneObj["rx"] = zone.rx
+		zoneObj["ry"] = zone.ry
+		zoneObj["page"] = zone.page
+		zoneObj["page_height"] = zone.page_height
+		zoneObj["page_width"] = zone.page_width
+		zoneArr.append(zoneObj)
+
+	output["zones"] = zoneArr
+	return jsonify(output)
+
+from .pdf_maker import *
+
+@app.route('/gen_pdf/<int:pid>')
+def gen_pdf_func(pid):
+	gen_pdf(pid)
+	return jsonify({
+			'status': 200,
+			'created': 201
+		})
