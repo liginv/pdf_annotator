@@ -376,7 +376,12 @@ export default {
       // console.log(this.array)
       this.selections = []
       this.obs = []
+      this.old_obs = []
+      this.del_obd = []
+      this.ed_ob = []
       this.scre = false
+      this.sdel = false
+      this.sed = false
       this.style = []
       this.c = 0
       /* const { convert, extract } = require("extract-pdf-by-coordinates")
