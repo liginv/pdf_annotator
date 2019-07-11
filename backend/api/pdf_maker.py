@@ -29,9 +29,9 @@ def gen_pdf(pid):
 	DATA = pdf.zones
 	ZONES = []
 	for zone in DATA:
-		while zone.page >= len(ZONES):
+		while zone.pageno-1 >= len(ZONES):
 			ZONES.append([])
-		ZONES[zone.page].append(zone)
+		ZONES[zone.pageno-1].append(zone)
 
 
 	output = PdfFileWriter()
@@ -47,8 +47,8 @@ def gen_pdf(pid):
 		width = int(list(old_pdf.getPage(index).mediaBox)[2])
 
 		for zone in currPage:
-			hr = height/zone.page_height
-			wr = width/zone.page_width
+			hr = height/zone.canvas_height
+			wr = width/zone.canvas_width
 			can.drawString(0.5*wr+zone.lx*wr,height - zone.ly*hr-10*hr,zone.zname)
 
 		can.save()
