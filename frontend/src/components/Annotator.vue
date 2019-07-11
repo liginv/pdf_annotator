@@ -10,7 +10,7 @@
       <PDF @get="getcan" :getcan="getcan" :setPdfSize="setPdfSize" :arrayBuffer="arrayBuffer" v-if="arrayBuffer"></PDF>
       <div class="area-select">
       <SelectionPreview :znamech="znamech" :coordinates="coordinates" v-if="arrayBuffer"></SelectionPreview>
-      <AreaSelect :highliht="null" :fill="fill" :coordinates="coordinates" ref="activeSelector" color="rgb(0,255,0)" active="true"></AreaSelect>
+      <AreaSelect :highlight="null" :fill="fill" :coordinates="coordinates" ref="activeSelector" color="rgb(0,255,0)" active="true"></AreaSelect>
       <div v-if="fill === false">
       <AreaSelect v-for="(ob,ind) in obs"
         :key="old_obs.length + ind"
