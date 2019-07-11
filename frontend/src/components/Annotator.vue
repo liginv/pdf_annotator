@@ -21,6 +21,7 @@
         :dimensions="dimensions"
         :fill="false"
         :entry="entry"
+        :highlight="highlight"
       ></AreaSelect>
       </div>
       <AreaSelect v-for="(old_ob,o_ind) in old_obs"
@@ -33,6 +34,7 @@
         :dimensions="dimensions"
         :fill="fill"
         :entry="entry"
+        :highlight="highlight"
       >{{this.o_ind}}</AreaSelect>
       <!--div v-for="coordinate in coordinates" :key='coordinate'>
       <select name="2" id="2">
@@ -80,7 +82,7 @@ export default {
     //   })
     // doc.output('dataurlnewwindow')
   },
-  props: ['src', 'name', 'selections', 'addSelection', 'arrayBuffer', 'setPdfSize', 'dimensions', 'pageoffset', 'obs', 'old_obs', 'fill', 'entry', 'znamech', 'getcan'],
+  props: ['src', 'name', 'selections', 'addSelection', 'arrayBuffer', 'setPdfSize', 'dimensions', 'pageoffset', 'obs', 'old_obs', 'fill', 'entry', 'znamech', 'getcan', 'highlight'],
   data () {
     return {
       pdfsize: 'setPdfSize',
