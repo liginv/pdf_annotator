@@ -15,13 +15,10 @@ import datetime
 import os
 
 def gen_pdf(pid):
-	# cwd = os.getcwd()
-	# os.chdir(os.getcwd()+'/api/zip_container/')
 	folder_name = datetime.datetime.now().strftime('%s')
-	
 	if not os.path.exists(folder_name):
 		os.mkdir(folder_name)
-
+	
 	pdf = Pdf.query.get(pid)
 	pfile = pdf.pfile
 	pname = pdf.pname
@@ -30,9 +27,6 @@ def gen_pdf(pid):
 	f.write(pfile)
 
 	DATA = pdf.zones
-
-	print(DATA)
-
 	ZONES = []
 	for zone in DATA:
 		while zone.page >= len(ZONES):
@@ -41,12 +35,11 @@ def gen_pdf(pid):
 
 
 	output = PdfFileWriter()
-	#old_pdf = PdfFileReader(open("api/hr.pdf","rb"))
+	
 	old_pdf = PdfFileReader(folder_name+'/'+pname)
 	for index,currPage in enumerate(ZONES):
 		if len(currPage) == 0:
 			continue
-
 		packet = io.BytesIO()
 		can = canvas.Canvas(packet)
 
@@ -56,9 +49,7 @@ def gen_pdf(pid):
 		for zone in currPage:
 			hr = height/zone.page_height
 			wr = width/zone.page_width
-
-			can.drawString(zone['lx'],height - zone['ly'],zone['zname'])
-			can.drawString(0.5*wr+zone['lx']*wr,height - zone['ly']*hr-10*hr,zone['zname']+"zzzzzzzzz")
+			can.drawString(0.5*wr+zone.lx*wr,height - zone.ly*hr-10*hr,zone.zname)
 
 		can.save()
 
@@ -69,8 +60,6 @@ def gen_pdf(pid):
 		page.mergePage(new_pdf.getPage(0))
 		output.addPage(page)
 
-		outputStream = open("des.pdf","ab")
+		outputStream = open(folder_name + "/des.pdf","ab")
 		output.write(outputStream)
 		outputStream.close()
-
-	# os.chdir(cwd)
