@@ -20,14 +20,22 @@ class Zone(db.Model):
 	ly = db.Column(db.Integer, nullable=False)
 	rx = db.Column(db.Integer, nullable=False)
 	ry = db.Column(db.Integer, nullable=False)
+
+	page = db.Column(db.Integer, nullable=False)
+	page_height = db.Column(db.Float, nullable=False)
+	page_width = db.Column(db.Float, nullable=False)
+	
 	pid = db.Column(db.Integer, db.ForeignKey('pdf.pid'), nullable=False)
 
-	def __init__(self,name,lx,ly,rx,ry):
+	def __init__(self,name,lx,ly,rx,ry,page,page_height,page_width):
 		self.zname = name
 		self.lx = lx
 		self.ly = ly
 		self.rx = rx
 		self.ry = ry
+		self.page = page
+		self.page_height = page_height
+		self.page_width = page_width
 
 	def __repr__(self):
 		return f'Zone({self.zname},{self.lx},{self.ly},{self.rx},{self.ry})'

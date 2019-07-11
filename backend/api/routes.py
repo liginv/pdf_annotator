@@ -15,7 +15,7 @@ def post_pdf():
 	resp.headers['Access-Control-Allow-Headers'] = 'Content-Type'
 	resp.status_code = 204
 	#response.headers.add('Access-Control-Allow-Origin', '*')
-	pfile = request.form['pfile']
+	pfile = request.files['pfile']
 	#create a pdf instance by passing respective data
 	pdf = Pdf(pfile.filename,pfile.read())
 	#save to database
@@ -34,6 +34,9 @@ def put_zones():
 		zone.ly = zone_obj.get('ly')
 		zone.rx = zone_obj.get('rx')
 		zone.ry = zone_obj.get('ry')
+		zone.page = zone_obj.get('page')
+		zone.page_height = zone_obj.get('page_height')
+		zone.page_width = zone_obj.get('page_width')
 		db.session.commit()
 		output.append(zone)
 	result = zones_schema.dump(output)
@@ -41,7 +44,7 @@ def put_zones():
 
 @app.route('/post_zones', methods=['POST'])
 def post_zones():
-	print(request.get_json())
+	#print(request.get_json())
 	res = Response()
 	res.headers = {
 		'Accept': 'application/json',
@@ -50,21 +53,22 @@ def post_zones():
 		'Access-Control-Allow-Methods': 'POST, OPTIONS',
 		'Access-Control-Allow-Origin': '*'
 	}
+
+	pid = request.json['pid']
 	zones = request.json['zones']
-	print(zones)
+
+	print(pid,zones)
+
 	output = []
-	pid=0
+
 	for zone_obj in zones:
-		pid=pid+1
-		zone = Zone(zone_obj['cordinates']['zname'],zone_obj['cordinates']['lx'],zone_obj['cordinates']['ly'],zone_obj['cordinates']['rx'],zone_obj['cordinates']['ry'])
+		zone = Zone(zone_obj['zname'],zone_obj['lx'],zone_obj['ly'],zone_obj['rx'],zone_obj['ry'],zone_obj['page'],zone_obj['page_height'],zone_obj['page_width'])
 		zone.pid = pid
 		db.session.add(zone)
 		db.session.commit()
 		output.append(zone)
+	
 	result = zones_schema.dump(output)
-	jsonify(result.data)
-
-	print(request.json)
 
 	res.response = {
 		'status': 200
@@ -111,9 +115,20 @@ def get_pdf(pdf_id):
 		zoneObj["ly"] = zone.ly
 		zoneObj["rx"] = zone.rx
 		zoneObj["ry"] = zone.ry
+		zoneObj["page"] = zone.page
+		zoneObj["page_height"] = zone.page_height
+		zoneObj["page_width"] = zone.page_width
 		zoneArr.append(zoneObj)
 
 	output["zones"] = zoneArr
-	return json.dumps(output)
+	return jsonify(output)
 
+from .pdf_maker import *
 
+@app.route('/gen_pdf/<int:pid>')
+def gen_pdf_func(pid):
+	gen_pdf(pid)
+	return jsonify({
+			'status': 200,
+			'created': 201
+		})
