@@ -10,11 +10,6 @@ def home():
 
 @app.route('/post_pdf', methods=['POST'])
 def post_pdf():
-	resp = Response()
-	resp.headers['Access-Control-Allow-Origin'] = '*'
-	resp.headers['Access-Control-Allow-Headers'] = 'Content-Type'
-	resp.status_code = 204
-	#response.headers.add('Access-Control-Allow-Origin', '*')
 	pfile = request.files['pfile']
 	#create a pdf instance by passing respective data
 	pdf = Pdf(pfile.filename,pfile.read())
@@ -30,13 +25,15 @@ def put_zones():
 	for zone_obj in zones:
 		zone = Zone.query.get(zone_obj.get('zid'))
 		zone.zname = zone_obj.get('zname')
-		zone.lx = zone_obj.get('lx')
-		zone.ly = zone_obj.get('ly')
-		zone.rx = zone_obj.get('rx')
-		zone.ry = zone_obj.get('ry')
-		zone.page = zone_obj.get('page')
-		zone.page_height = zone_obj.get('page_height')
-		zone.page_width = zone_obj.get('page_width')
+		zone.left = zone_obj.get('left')
+		zone.top = zone_obj.get('top')
+		zone.width = zone_obj.get('width')
+		zone.heigth = zone_obj.get('height')
+		zone.pageOffset_left = zone_obj.get('pageOffset_left')
+		zone.pageOffset_top = zone_obj.get('pageOffset_top')
+		zone.pageno = zone_obj.get('pageno')
+		zone.canvas_width = zone_obj.get('canvas_width')
+		zone.canvas_height = zone_obj.get('canvas_height')
 		db.session.commit()
 		output.append(zone)
 	result = zones_schema.dump(output)
@@ -44,7 +41,7 @@ def put_zones():
 
 @app.route('/post_zones', methods=['POST'])
 def post_zones():
-	#print(request.get_json())
+	
 	res = Response()
 	res.headers = {
 		'Accept': 'application/json',
@@ -57,13 +54,10 @@ def post_zones():
 	pid = request.json['pid']
 	zones = request.json['zones']
 
-	print(pid,zones)
-
 	output = []
-
 	for zone_obj in zones:
-		zone = Zone(zone_obj['zname'],zone_obj['lx'],zone_obj['ly'],zone_obj['rx'],zone_obj['ry'],zone_obj['page'],zone_obj['page_height'],zone_obj['page_width'])
-		zone.pid = pid
+		zone = Zone(zone_obj['zname'],zone_obj['left'],zone_obj['top'],zone_obj['width'],zone_obj['height'],zone_obj['pageOffset_left'],zone_obj['pageOffset_top'],zone_obj['pageno'],zone_obj['canvas_width'],zone_obj['canvas_height'])
+		zone.pid = request.json['pid']
 		db.session.add(zone)
 		db.session.commit()
 		output.append(zone)
@@ -78,15 +72,17 @@ def post_zones():
 
 @app.route('/delete_zones', methods=['DELETE'])
 def delete_zones():
-	zones = request.json['zones']
+	zids = request.json['zids']
 	output = []
-	for zone_obj in zones:
-		zone = Zone.query.get(zone_obj.get('zid'))
+	
+	for zid in zids:
+		zone = Zone.query.get(zid)
 		db.session.delete(zone)
 		db.session.commit()
 		output.append(zone)
 	result = zones_schema.dump(output)
-	return jsonify(result.data)
+
+	return  jsonify(result.data)
 
 @app.route('/get_pdfs')
 def get_pdfs():
@@ -111,13 +107,15 @@ def get_pdf(pdf_id):
 		zoneObj = {}
 		zoneObj["zid"] = zone.zid
 		zoneObj["zname"] = zone.zname
-		zoneObj["lx"] = zone.lx
-		zoneObj["ly"] = zone.ly
-		zoneObj["rx"] = zone.rx
-		zoneObj["ry"] = zone.ry
-		zoneObj["page"] = zone.page
-		zoneObj["page_height"] = zone.page_height
-		zoneObj["page_width"] = zone.page_width
+		zoneObj["left"] = zone.left
+		zoneObj["top"] = zone.top
+		zoneObj["width"] = zone.width
+		zoneObj["height"] = zone.height
+		zoneObj["pageOffset_left"] = zone.pageOffset_left
+		zoneObj["pageOffset_top"] = zone.pageOffset_top
+		zoneObj["pageno"] = zone.pageno
+		zoneObj["canvas_width"] = zone.canvas_width
+		zoneObj["canvas_height"] = zone.canvas_height
 		zoneArr.append(zoneObj)
 
 	output["zones"] = zoneArr

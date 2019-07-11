@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="jsPDF/src/jspdf.js"></script>
+    <script src="jsPDF/src/deprecated/from_html.js"></script>
+    <script src="jsPDF/src/modules/split_text_to_size.js"></script>
+    <script src="jsPDF/src/modules/standard_fonts_metrics.js"></script>
+</head>
+  <body>
+    <p id="ignorePDF">don't print this to pdf</p>
+    <div>
+      <p color="red">print this to pdf</p>
+    </div>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script> -->
+    
+    <script type="text/javascript">
+
+    var doc = new jsPDF();          
+    var elementHandler = {
+    '#ignorePDF': function (element, renderer) {
+        return true;
+    }
+    };
+    var source = window.document.getElementsByTagName("body")[0];
+    doc.fromHTML(
+        source,
+        15,
+        15,
+        {
+        'width': 180,'elementHandlers': elementHandler
+        });
+
+doc.output("dataurlnewwindow");
+</script>
+  </body>
+</html>

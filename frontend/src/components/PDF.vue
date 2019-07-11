@@ -11,14 +11,14 @@ import pdfViewerPDFJS from '@/../node_modules/pdfjs-dist/web/pdf_viewer.js'
 PDFJS.PDFViewer = pdfViewerPDFJS.PDFJS.PDFViewer
 
 export default {
-  props: ['arrayBuffer', 'setPdfSize'],
+  props: ['arrayBuffer', 'setPdfSize', 'getcan'],
   data () {
     return {
       width: null
     }
   },
   created () {
-    console.log('PDF created')
+
   },
   computed: {
     styleObject () {
@@ -38,6 +38,16 @@ export default {
       PDFJS.getDocument(this.arrayBuffer).then((pdf) => {
         pdf.getPage(1).then((page) => {
           var viewport = page.getViewport(1)
+          // let r = document.getElementsByTagName('canvas')
+          // let arr = Array.from(r).filter(function (item) {
+          //   return item
+          // })
+          // console.log(arr)
+          // console.log(arr[0].length)
+          // for (let i; r; i++) {
+          //   console.log(r[i])
+          // }
+          // console.log(viewport)
           this.setPdfSize(viewport.width, viewport.height)
           this.width = viewport.width
           this.pdfViewer.setDocument(pdf).then(data => {
@@ -58,8 +68,29 @@ export default {
       this.pdfViewer.currentScaleValue = 'page-width'
     })
     this.loadDocument()
+
+    setTimeout(function () {
+      Array.from(document.getElementsByTagName('canvas')).forEach(item => {
+        console.log('Item: ', item.offsetHeight, item.offsetWidth)
+      })
+    }, 1000)
+    let self = this
+    setTimeout(function () {
+      console.log(document.getElementsByTagName('canvas').length)
+      let set = Array.from(document.getElementsByTagName('canvas')).map((item) => {
+        return { width: item.offsetWidth, height: item.offsetHeight }
+      })
+      self.getcan(set)
+      console.log(set)
+    }, 1000)
   }
 }
+document.addEventListener('DOMContentLoaded', function (e) {
+  let r = document.getElementsByTagName('canvas')
+  console.log(r)
+  console.log(r.length)
+})
+console.log('sdfnfdgkjjklvklsnvsdkvnsnklvnsdvnk')
 </script>
 
 <style>

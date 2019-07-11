@@ -1,23 +1,33 @@
 <template>
-  <div class='preview'>
+  <div class='preview' >
   {{ text }}
   </div>
 </template>
 
 <script>
 export default {
-  props: ['coordinates'],
+  props: ['coordinates', 'znamech'],
+  created () {
+    console.log('selectionpreviewcreated')
+  },
   data () {
     return {
       text: null
     }
   },
-  computed: {
+  updated () {
+    // console.log(this.text)
+    if (this.text === null) {
+      this.text = ''
+    }
+    // this.$emit('zname', this.text)
+    this.znamech(this.text)
   },
   watch: {
     coordinates () {
       this.highlightOverlaps()
-      // this.text = this.overlappingText()
+      this.text = this.overlappingText()
+      // console.log(this.text)
     }
   },
   methods: {
@@ -37,7 +47,10 @@ export default {
       }
     },
     overlappingText () {
-      return this.overlapping().map((element) => element.textContent).join(' ')
+      // console.log(this.overlapping().textContent)
+      let content = this.overlapping().map((element) => element.textContent).join(' ')
+      // console.log(content)
+      return content
     },
     highlightOverlaps () {
       this.unhighlight()
