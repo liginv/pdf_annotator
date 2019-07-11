@@ -129,3 +129,15 @@ def gen_pdf_func(pid):
 	return jsonify({
 			'status': 200
 		})
+
+@app.route('/fill/<int:pid>')
+def fill(pid):
+	pdf = Pdf.query.get(pid)
+	if not pdf:
+		return jsonify({
+			'status': 404
+		})
+	excel = request.files['excel']
+	pdf.efile = excel
+	pdf.ename = excel.filename
+	db.session.commit()

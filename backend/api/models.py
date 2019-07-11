@@ -5,6 +5,8 @@ class Pdf(db.Model):
 	pname = db.Column(db.String(255), nullable=False)
 	pfile = db.Column(db.LargeBinary)
 	zones = db.relationship('Zone', backref='zone', lazy=True)
+	efile = db.Column(db.LargeBinary, nullable=True)
+	ename = db.Column(db.String(255), nullable=True)
 
 	def __init__(self,name,data):
 		self.pname = name
