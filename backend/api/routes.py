@@ -129,6 +129,5 @@ from .pdf_maker import *
 def gen_pdf_func(pid):
 	gen_pdf(pid)
 	return jsonify({
-			'status': 200,
-			'created': 201
+			'status': 200
 		})
