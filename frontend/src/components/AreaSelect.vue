@@ -17,7 +17,7 @@ import randomColor from 'randomcolor'
 
 export default {
   name: 'area-select',
-  props: ['coordinates', 'name', 'active', 'dimensions', 'pageoffset_top', 'pageoffset_left', 'fill', 'entry', 'keyid'],
+  props: ['coordinates', 'name', 'active', 'dimensions', 'pageoffset_top', 'pageoffset_left', 'fill', 'entry', 'keyid', 'highlight'],
   created () {
     // console.log(this.entry)
     // console.log(this.keyid)
@@ -29,12 +29,12 @@ export default {
     // console.log(this.coordinates.lx)
     // console.log(this.coordinates.zname)
   },
-  // updated () {
+  updated () {
   //   if (this.fill === true) {
   //     this.name = this.entry[this.keyid]
   //     console.log(this.entry[this.keyid])
   //   }
-  // },
+  },
   data () {
     return {
       color: randomColor({format: 'rgb'})
@@ -53,17 +53,32 @@ export default {
         }
       }
       if (this.fill === false) {
-        return {
-          // left: this.coordinates.lx + this.pageoffset.left + 'px',
-          // top: this.dimensions.height - this.coordinates.ly + this.pageoffset.top - 3 + 'px',
-          // width: this.coordinates.rx - this.coordinates.lx + 'px',
-          // height: this.coordinates.ly - this.coordinates.ry + 'px',
-          left: this.coordinates.left + this.coordinates.pageOffset_left + 'px',
-          top: this.coordinates.top + this.coordinates.pageOffset_top - 3 + 'px',
-          width: this.coordinates.width + 'px',
-          height: this.coordinates.height + 'px',
-          border: 'solid ' + this.color + ' 1px',
-          background: this.color.replace(/\)$/, ', 0.05)').replace('rgb(', 'rgba(')
+        if (this.coordinates.zname === this.highlight) {
+          return {
+            // left: this.coordinates.lx + this.pageoffset.left + 'px',
+            // top: this.dimensions.height - this.coordinates.ly + this.pageoffset.top - 3 + 'px',
+            // width: this.coordinates.rx - this.coordinates.lx + 'px',
+            // height: this.coordinates.ly - this.coordinates.ry + 'px',
+            left: this.coordinates.left + this.coordinates.pageOffset_left + 'px',
+            top: this.coordinates.top + this.coordinates.pageOffset_top - 3 + 'px',
+            width: this.coordinates.width + 'px',
+            height: this.coordinates.height + 'px',
+            border: 'solid ' + this.color + ' 3px',
+            background: this.color.replace(/\)$/, ', 0.05)').replace('rgb(', 'rgba(')
+          }
+        } else {
+          return {
+            // left: this.coordinates.lx + this.pageoffset.left + 'px',
+            // top: this.dimensions.height - this.coordinates.ly + this.pageoffset.top - 3 + 'px',
+            // width: this.coordinates.rx - this.coordinates.lx + 'px',
+            // height: this.coordinates.ly - this.coordinates.ry + 'px',
+            left: this.coordinates.left + this.coordinates.pageOffset_left + 'px',
+            top: this.coordinates.top + this.coordinates.pageOffset_top - 3 + 'px',
+            width: this.coordinates.width + 'px',
+            height: this.coordinates.height + 'px',
+            border: 'solid ' + this.color + ' 1px',
+            background: this.color.replace(/\)$/, ', 0.05)').replace('rgb(', 'rgba(')
+          }
         }
       } else {
         return {

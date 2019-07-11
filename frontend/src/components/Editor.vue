@@ -21,7 +21,7 @@
           </div>
         </div>
         <div v-for="(i, ind) in obs" :key="old_obs.length + ind">
-          <input type="text" :value="i.zname" @keyup.13="edit(i,$event)" :can="true">
+          <input type="text" :value="i.zname" @mouseleave="highlight=null" @mouseover="highlight=i.zname" @keyup.13="edit(i,$event)" :can="true">
           {{ }}
           <button @click="del(ind)">x</button>
         </div>
@@ -41,7 +41,7 @@
       </div>
     </div>
       <div class='content'>
-        <Annotator :getcan="getcan" :znamech="znamech" :entry="entry" :fill="fill" :old_obs="old_obs" :pageoffset="pageoffset" :dimensions="pdfDimensions" :obs="obs" :src="src" :setPdfSize="setPdfSize" :arrayBuffer="arrayBuffer" :name="name" :selections="selections" :addSelection="addSelection"></Annotator>
+        <Annotator :highlight="highlight" :getcan="getcan" :znamech="znamech" :entry="entry" :fill="fill" :old_obs="old_obs" :pageoffset="pageoffset" :dimensions="pdfDimensions" :obs="obs" :src="src" :setPdfSize="setPdfSize" :arrayBuffer="arrayBuffer" :name="name" :selections="selections" :addSelection="addSelection"></Annotator>
         <!--div v-for="st in style" :key="st.c">
         <select name="2" id="2" :style="st.s">
           <option value="af">sdsdg</option>
@@ -70,6 +70,7 @@ export default {
   },
   data () {
     return {
+      highlight: null,
       can: false,
       sdel: false,
       sed: false,
@@ -406,7 +407,7 @@ export default {
         }) */
     }
   }
-};
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
