@@ -17,6 +17,7 @@ class Pdf(db.Model):
 
 class Zone(db.Model):
 	zid = db.Column(db.Integer, primary_key=True)
+	zdata = db.Column(db.String(500), nullable=True)
 	zname = db.Column(db.String(50), nullable=False)
 	left = db.Column(db.Integer, nullable=False)
 	top = db.Column(db.Integer, nullable=False)

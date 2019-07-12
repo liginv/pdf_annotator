@@ -2,7 +2,7 @@ from api.models import Pdf, Zone
 from flask import request, Response, jsonify, render_template
 from api import app, db
 from api.schema import zone_schema, pdf_schema, zones_schema, pdfs_schema
-import json
+from api.pdf_filler import gen_pdf
 
 @app.route('/', methods=['GET'])
 def home():
@@ -121,23 +121,29 @@ def get_pdf(pdf_id):
 	output["zones"] = zoneArr
 	return jsonify(output)
 
-from .pdf_maker import *
-
-@app.route('/gen_pdf/<int:pid>')
-def gen_pdf_func(pid):
-	gen_pdf(pid)
-	return jsonify({
-			'status': 200
-		})
-
 @app.route('/fill/<int:pid>')
 def fill(pid):
+	return gen_pdf(pid)
+
+@app.route('/upload')
+def upload_excel():
+	return render_template('excel_uploader.html')
+
+@app.route('/post_excel', methods=['POST'])
+def post_excel():
+	efile = request.files['excel']
+	ename = efile.filename
+	pid = request.form['pid']
+	#attatch the excel to the table Pdf
 	pdf = Pdf.query.get(pid)
-	if not pdf:
-		return jsonify({
-			'status': 404
-		})
-	excel = request.files['excel']
-	pdf.efile = excel
-	pdf.ename = excel.filename
-	db.session.commit()
+	resp = {
+		'status': 200
+	}
+	if pdf:
+		pdf.efile = efile.read()
+		pdf.ename = ename
+		db.session.commit()
+	else:
+		resp['status'] = 404
+	
+	return jsonify(resp)
