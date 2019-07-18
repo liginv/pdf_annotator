@@ -1,8 +1,11 @@
 from api.models import Pdf, Zone
 from flask import request, Response, jsonify, render_template
-from api import app, db
+from api import app, db, bcrypt
 from api.schema import zone_schema, pdf_schema, zones_schema, pdfs_schema
 from api.pdf_filler import gen_pdf
+from api.key_generator import api_key_generator
+from api.auth import *
+
 
 @app.route('/', methods=['GET'])
 def home():
@@ -147,3 +150,26 @@ def post_excel():
 		resp['status'] = 404
 	
 	return jsonify(resp)
+
+
+
+# @app.route('/login', methods=['POST'])
+# def login():
+# 	username = request.json['username']
+# 	password = request.json['password']
+# 	#check user
+# 	user = User.query.filter_by(username = username).first()
+# 	if user:
+# 		if bcrypt.check_password_hash(user.password, password):
+# 			user.api_key = api_key_generator()
+# 			db.session.commit()
+# 			return jsonify({
+# 					'username': username,
+# 					'apiKey': user.api_key
+# 				})
+
+# @app.route('/reset_api_key', methods=['POST'])
+# def reset_api_key():
+# 	#need either username-password or apikey
+# 	username = request.json.get(['username'])
+# 	password = request.json.get(['password'])
