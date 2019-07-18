@@ -1,1 +1,1 @@
-from api.auth import login, register
+from api.auth.routes import *

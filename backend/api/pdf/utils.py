@@ -3,7 +3,7 @@ from PyPDF2 import PdfFileWriter, PdfFileReader
 import io
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter,A4
-from api.models import Pdf
+from api.pdf.models import Pdf
 import datetime
 import os
 from flask import jsonify, send_file
