@@ -1,13 +1,15 @@
 from api.pdf.models import Pdf
 from flask import request, jsonify, render_template
 from api import app, db
-
+from api.auth.decorators import logged
 
 @app.route('/upload')
+@logged
 def excel_upload():
 	return render_template('excel_uploader.html')
 
 @app.route('/upload/create', methods=['POST'])
+@logged
 def excel_create():
 	efile = request.files['excel']
 	ename = efile.filename

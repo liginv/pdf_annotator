@@ -3,14 +3,16 @@ from api.pdf.models import Pdf
 from api.pdf.schema import pdf_schema, pdfs_schema
 from api.pdf.utils import gen_pdf
 from flask import request, jsonify
-
+from api.auth.decorators import logged
 
 @app.route('/pdf')
+@logged
 def pdf_all():
 	pdfs = pdfs_schema.dump(Pdf.query.all())
 	return jsonify(pdfs.data)
 
 @app.route('/pdf/<int:pdf_id>')
+@logged
 def pdf_get_pdf(pdf_id):
 	pdf = Pdf.query.get(pdf_id)
 	zones = pdf.zones
@@ -38,6 +40,7 @@ def pdf_get_pdf(pdf_id):
 	return jsonify(output)
 
 @app.route('/pdf/create', methods=['POST'])
+@logged
 def pdf_create():
 	pfile = request.files['pfile']
 	#create a pdf instance by passing respective data
@@ -48,5 +51,6 @@ def pdf_create():
 	return pdf_schema.jsonify(pdf)
 
 @app.route('/pdf/fill/<int:pid>')
+@logged
 def pdf_fill(pid):
 	return gen_pdf(pid)

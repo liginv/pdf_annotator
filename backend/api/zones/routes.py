@@ -2,13 +2,16 @@ from api.zones.models import Zone
 from flask import request, Response, jsonify
 from api import app, db, bcrypt
 from api.zones.schema import zone_schema, zones_schema
+from api.auth.decorators import logged
 
 @app.route('/zone')
+@logged
 def zone_all():
 	zones = zones_schema.dump(Zone.query.all())
 	return jsonify(zones.data)
 
 @app.route('/zone/create', methods=['POST'])
+@logged
 def zone_create():
 	res = Response()
 	res.headers = {
@@ -38,6 +41,7 @@ def zone_create():
 	return jsonify(result.data)
 
 @app.route('/zone/update', methods=['PUT'])
+@logged
 def zone_update():
 	zones = request.json['zones']
 	output = []
@@ -59,6 +63,7 @@ def zone_update():
 	return jsonify(result.data)
 
 @app.route('/zone/delete', methods=['DELETE'])
+@logged
 def zone_delete():
 	zids = request.json['zids']
 	output = []
