@@ -5,13 +5,13 @@ from api.pdf.utils import gen_pdf
 from flask import request, jsonify
 from api.auth.decorators import logged
 
-@app.route('/pdf')
+@app.route('/pdf', endpoint = 'pdf_all')
 @logged
 def pdf_all():
 	pdfs = pdfs_schema.dump(Pdf.query.all())
 	return jsonify(pdfs.data)
 
-@app.route('/pdf/<int:pdf_id>')
+@app.route('/pdf/<int:pdf_id>', endpoint = 'pdf_get_pdf')
 @logged
 def pdf_get_pdf(pdf_id):
 	pdf = Pdf.query.get(pdf_id)
@@ -39,7 +39,7 @@ def pdf_get_pdf(pdf_id):
 	output["zones"] = zoneArr
 	return jsonify(output)
 
-@app.route('/pdf/create', methods=['POST'])
+@app.route('/pdf/create', methods=['POST'], endpoint = 'pdf_create')
 @logged
 def pdf_create():
 	pfile = request.files['pfile']
@@ -50,7 +50,7 @@ def pdf_create():
 	db.session.commit()
 	return pdf_schema.jsonify(pdf)
 
-@app.route('/pdf/fill/<int:pid>')
+@app.route('/pdf/fill/<int:pid>', endpoint = 'pdf_fill')
 @logged
 def pdf_fill(pid):
 	return gen_pdf(pid)

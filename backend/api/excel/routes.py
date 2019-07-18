@@ -3,12 +3,12 @@ from flask import request, jsonify, render_template
 from api import app, db
 from api.auth.decorators import logged
 
-@app.route('/upload')
+@app.route('/upload', endpoint = 'excel_upload')
 @logged
 def excel_upload():
 	return render_template('excel_uploader.html')
 
-@app.route('/upload/create', methods=['POST'])
+@app.route('/upload/create', methods=['POST'], endpoint = 'excel_create')
 @logged
 def excel_create():
 	efile = request.files['excel']

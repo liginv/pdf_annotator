@@ -4,13 +4,13 @@ from api import app, db, bcrypt
 from api.zones.schema import zone_schema, zones_schema
 from api.auth.decorators import logged
 
-@app.route('/zone')
+@app.route('/zone', endpoint = 'zone_all')
 @logged
 def zone_all():
 	zones = zones_schema.dump(Zone.query.all())
 	return jsonify(zones.data)
 
-@app.route('/zone/create', methods=['POST'])
+@app.route('/zone/create', methods=['POST'], endpoint = 'zone_create')
 @logged
 def zone_create():
 	res = Response()
@@ -40,7 +40,7 @@ def zone_create():
 	}
 	return jsonify(result.data)
 
-@app.route('/zone/update', methods=['PUT'])
+@app.route('/zone/update', methods=['PUT'], endpoint = 'zone_update')
 @logged
 def zone_update():
 	zones = request.json['zones']
@@ -62,7 +62,7 @@ def zone_update():
 	result = zones_schema.dump(output)
 	return jsonify(result.data)
 
-@app.route('/zone/delete', methods=['DELETE'])
+@app.route('/zone/delete', methods=['DELETE'], endpoint = 'zone_delete')
 @logged
 def zone_delete():
 	zids = request.json['zids']
