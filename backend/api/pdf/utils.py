@@ -93,7 +93,6 @@ def process_excel(pdf, folder_path, pdf_path):
 		#generate pdf for each record
 		fill_pdf(folder_path,pdf_path,arr[i],i)
 		
-
 def gen_pdf(pid):
 	folder_path = create_dir()
 	#if exists send 500 error

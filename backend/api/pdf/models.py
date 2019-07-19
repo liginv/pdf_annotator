@@ -7,6 +7,7 @@ class Pdf(db.Model):
 	zones = db.relationship('Zone', backref='zone', lazy=True)
 	efile = db.Column(db.LargeBinary, nullable=True)
 	ename = db.Column(db.String(255), nullable=True)
+	uid = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
 
 	def __init__(self,name,data):
 		self.pname = name

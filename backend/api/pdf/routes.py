@@ -4,17 +4,19 @@ from api.pdf.schema import pdf_schema, pdfs_schema
 from api.pdf.utils import gen_pdf
 from flask import request, jsonify
 from api.auth.decorators import logged
+from api.pdf.decorators import belongs_to
 
 @app.route('/pdf', endpoint = 'pdf_all')
 @logged
-def pdf_all():
-	pdfs = pdfs_schema.dump(Pdf.query.all())
+def pdf_all(*args, **kwargs):
+	pdfs = pdfs_schema.dump(Pdf.query.filter_by(uid = kwargs.get('uid')))
 	return jsonify(pdfs.data)
 
-@app.route('/pdf/<int:pdf_id>', endpoint = 'pdf_get_pdf')
+@app.route('/pdf/<int:pid>', endpoint = 'pdf_get_pdf')
 @logged
-def pdf_get_pdf(pdf_id):
-	pdf = Pdf.query.get(pdf_id)
+@belongs_to
+def pdf_get_pdf(pid,*args,**kwargs):
+	pdf = Pdf.query.get(pid)
 	zones = pdf.zones
 	output = {}
 	output["pid"] = pdf.pid
@@ -41,10 +43,11 @@ def pdf_get_pdf(pdf_id):
 
 @app.route('/pdf/create', methods=['POST'], endpoint = 'pdf_create')
 @logged
-def pdf_create():
+def pdf_create(*args, **kwargs):
 	pfile = request.files['pfile']
 	#create a pdf instance by passing respective data
 	pdf = Pdf(pfile.filename,pfile.read())
+	pdf.uid = kwargs['uid']
 	#save to database
 	db.session.add(pdf)
 	db.session.commit()
@@ -52,5 +55,6 @@ def pdf_create():
 
 @app.route('/pdf/fill/<int:pid>', endpoint = 'pdf_fill')
 @logged
+@belongs_to
 def pdf_fill(pid):
 	return gen_pdf(pid)
