@@ -4,21 +4,12 @@ from flask import request, Response, jsonify
 from api import app, db, bcrypt
 from api.zones.schema import zone_schema, zones_schema
 from api.auth.decorators import logged
-
+from flask_cors import cross_origin
 
 @app.route('/zone/create', methods=['POST'], endpoint = 'zone_create')
+@cross_origin(supports_credentials=True)
 @logged
 def zone_create(*args, **kwargs):
-	#handles XSRF
-	res = Response()
-	res.headers = {
-		'Accept': 'application/json',
-		'Content-Type': 'application/json',
-		'Access-Control-Allow-Headers': 'Content-Type',
-		'Access-Control-Allow-Methods': 'POST, OPTIONS',
-		'Access-Control-Allow-Origin': '*'
-	}
-
 	try:
 		#validate request
 		pid = request.json['pid']
@@ -50,9 +41,6 @@ def zone_create(*args, **kwargs):
 			output.append(zone)
 		
 		result = zones_schema.dump(output)
-		res.response = {
-			'success': 'zone created'
-		}
 		return jsonify(result.data), 200
 	
 	except AssertionError:
@@ -62,6 +50,7 @@ def zone_create(*args, **kwargs):
 		})
 
 @app.route('/zone/update', methods=['PUT'], endpoint = 'zone_update')
+@cross_origin(supports_credentials=True)
 @logged
 def zone_update(*args, **kwargs):
 	zones = request.json['zones']
@@ -105,6 +94,7 @@ def zone_update(*args, **kwargs):
 	return jsonify(result.data)
 
 @app.route('/zone/delete', methods=['DELETE'], endpoint = 'zone_delete')
+@cross_origin(supports_credentials=True)
 @logged
 def zone_delete(*args, **kwargs):
 	zids = request.json['zids']

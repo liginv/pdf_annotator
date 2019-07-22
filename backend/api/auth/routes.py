@@ -9,8 +9,10 @@ from api.auth.utils import (
     validate_username,
     gen_key
 )
+from flask_cors import cross_origin
 
 @app.route('/auth/register', methods = ['POST'])
+@cross_origin(supports_credentials=True)
 def auth_register():
     #response object
     resp = {}
@@ -43,6 +45,7 @@ def auth_register():
     return jsonify(resp), status
 
 @app.route('/auth/login', methods = ['POST'])
+@cross_origin(supports_credentials=True)
 def auth_login():
     #response object
     resp = {}
