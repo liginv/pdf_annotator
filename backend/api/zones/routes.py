@@ -45,9 +45,9 @@ def zone_create(*args, **kwargs):
 	
 	except AssertionError:
 		return jsonify({
-			'error': 'invalid request',
-			'reason': 'requested resource does not belongs to current user'
-		})
+			'error': 'Invalid request',
+			'reason': 'Requested resource does not belongs to the current user'
+		}), 400
 
 @app.route('/zone/update', methods=['PUT'], endpoint = 'zone_update')
 @cross_origin(supports_credentials=True)
@@ -65,9 +65,9 @@ def zone_update(*args, **kwargs):
 			assert(pdf.uid == kwargs.get('uid'))
 	except AssertionError:
 		return jsonify({
-			'error': 'invalid request',
-			'reason': 'request contains resource which does not belongs to current user'
-		})
+			'error': 'Invalid request',
+			'reason': 'Requested resource does not belongs to the current user'
+		}), 400
 	#valid request
 	output = []
 	for zone_obj in zones:
@@ -108,9 +108,9 @@ def zone_delete(*args, **kwargs):
 			assert(pdf.uid == kwargs.get('uid'))
 	except AssertionError:
 		return jsonify({
-			'error': 'invalid request',
-			'reason': 'request contains resource which does not belongs to current user'
-		})
+			'error': 'Invalid request',
+			'reason': 'Requested resource does not belongs to the current user'
+		}), 400
 	#valid request
 	output = []
 	for zid in zids:

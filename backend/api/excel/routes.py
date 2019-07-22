@@ -27,10 +27,10 @@ def excel_create():
 		db.session.commit()
 	else:
 		return jsonify({
-			'error': 'invalid request',
-			'reason': 'requested resource does not belongs to the current user'
+			'error': 'Invalid request',
+			'reason': 'Requested resource does not belongs to the current user'
 		}), 400
 	
 	return jsonify({
-		'success': 'file uploaded successfully'
+		'success': 'File uploaded successfully'
 	}), 200

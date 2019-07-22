@@ -1,6 +1,5 @@
 from api.auth.models import User
 from api.pdf.models import Pdf
-from api.status_codes import status_codes
 from flask import request, jsonify
 
 def logged(func):
@@ -19,17 +18,17 @@ def logged(func):
             user = User.query.filter_by(key = key).first()
             if not user:
                 return jsonify({
-                    'error': 'auth failed',
-                    'reason': 'invalid api key'
-                }), status_codes['BAD_REQUEST']
+                    'error': 'Authentication failed',
+                    'reason': 'Invalid api key'
+                }), 401
             #user valid
             kwargs['uid'] = user.id
 
         except KeyError:
             return jsonify({
-                'error': 'auth failed',
-                'reason': 'api key required'
-            }), status_codes['BAD_REQUEST']
+                'error': 'Authentication failed',
+                'reason': 'Api key required'
+            }), 401
         else:
             return func(*args, **kwargs)
     return check_api_key
