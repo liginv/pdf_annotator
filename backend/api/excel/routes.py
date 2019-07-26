@@ -1,27 +1,25 @@
 from api.pdf.models import Pdf
-from flask import request, jsonify, render_template
+from flask import request, jsonify
 from api import app, db
 from api.auth.decorators import logged
-from api.pdf.decorators import belongs_to
 from flask_cors import cross_origin
 
-@app.route('/upload', endpoint = 'excel_upload')
-@cross_origin(supports_credentials=True)
-@logged
-def excel_upload():
-	return render_template('excel_uploader.html')
+# @app.route('/upload', endpoint = 'excel_upload')
+# @cross_origin(supports_credentials=True)
+# @logged
+# def excel_upload():
+	
 
 @app.route('/upload/create', methods=['POST'], endpoint = 'excel_create')
 @cross_origin(supports_credentials=True)
 @logged
-@belongs_to
-def excel_create():
+def excel_create(*args, **kwargs):
 	efile = request.files['excel']
 	ename = efile.filename
 	pid = request.form['pid']
 	#attatch the excel to the Pdf
 	pdf = Pdf.query.get(pid)
-	if pdf:
+	if pdf and pdf.uid == kwargs.get('uid'):
 		pdf.efile = efile.read()
 		pdf.ename = ename
 		db.session.commit()

@@ -1,13 +1,32 @@
 import pandas as pd
 from PyPDF2 import PdfFileWriter, PdfFileReader
+import io
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter,A4
 from api.pdf.models import Pdf
+import datetime
 import os
-import io
-from io import BytesIO
 from flask import jsonify, send_file
 import zipfile
+
+def create_zip(folder_path, exceptions = []):
+	cwd = os.getcwd()
+	os.chdir(folder_path)
+	with zipfile.ZipFile('pdf.zip', 'w') as myzip:
+		for r,d,f in os.walk(folder_path):
+			for f_ in f:
+				if f_[:4] == 'dest':
+					myzip.write(f_)
+	os.chdir(cwd)
+
+def create_dir():
+	#unique folder name
+	folder_name = datetime.datetime.now().strftime('%s')
+	#folder doesn't exists
+	if not os.path.exists(os.path.join(os.getcwd(),'zip',folder_name)):
+		os.mkdir(os.path.join(os.getcwd(),'zip',folder_name))
+		return os.path.join(os.getcwd(),'zip',folder_name)
+	return None
 
 def adjust_text(data, width):
 	data = list(data)
@@ -28,7 +47,7 @@ def adjust_text(data, width):
 	data_arr.append(line)
 	return data_arr
 
-def fill_pdf(pdf_data, data, i):
+def fill_pdf(folder_path, pdf_path, data, i):
 	zones = []
 	#group zones to pages
 	for zone in data:
@@ -36,7 +55,8 @@ def fill_pdf(pdf_data, data, i):
 			zones.append([])
 		zones[zone.pageno-1].append(zone)
 	#initialise pdffilewriter and pdffilereader
-	old_pdf = PdfFileReader(pdf_data)
+	output = PdfFileWriter()
+	old_pdf = PdfFileReader(pdf_path)
 	#for all page
 	for pageno,curr_page in enumerate(zones):
 		if len(curr_page) == 0:
@@ -61,7 +81,10 @@ def fill_pdf(pdf_data, data, i):
 				t.setFillColor("blue")
 				t.textOut(line)
 				can.drawText(t)
-				
+			#write the data on the packet at the specified location
+			#0.5*wr and 10*hr are the buffers
+			
+			#can.drawString(0.5*wr+zone.left*wr,height - zone.top*hr-10*hr,zone.zdata)
 		#save the canvas and bring the cursor to the very first
 		can.save()
 		packet.seek(0)
@@ -70,26 +93,26 @@ def fill_pdf(pdf_data, data, i):
 		#merge corresponding pdf page and packet
 		page = old_pdf.getPage(pageno)
 		page.mergePage(new_pdf.getPage(0))
-		output = PdfFileWriter()
 		output.addPage(page)
-		
-		output_stream = BytesIO()
-		output.write(output_stream)
-		output_stream.seek(0)
-		return output_stream
+		#write it to the output stream
+		destination = os.path.join(folder_path,'dest'+str(i)+'.pdf')
+		outputStream = open(destination,"ab")
+		output.write(outputStream)
+		outputStream.close()
 
-def process_excel(pdf, pdf_data):
-	# excel_path = os.path.join(folder_path, pdf.ename)
-	excel_data = BytesIO(pdf.efile)
-	excel_data.seek(0)
+def process_excel(pdf, folder_path, pdf_path):
+	excel_path = os.path.join(folder_path, pdf.ename)
+	#save excel to the folder
+	f = open(excel_path,'wb')
+	f.write(pdf.efile)
+	f.close()
 	#read excel
-	excel = pd.read_excel(excel_data)
+	excel = pd.read_excel(excel_path)
 	keys = excel.keys()
 	length = len(excel[keys[0]])
 	#create a copy of zones
 	zones = pdf.zones.copy()
 	arr = []
-	pdf_col = []
 	for i in range(length):
 		arr.append(zones.copy())
 
@@ -97,11 +120,16 @@ def process_excel(pdf, pdf_data):
 		for zone in arr[i]:
 			zone.zdata = str(excel[zone.zname][i])
 		#generate pdf for each record
-		pdf_col.append(fill_pdf(pdf_data,arr[i],i))
-
-	return pdf_col
+		fill_pdf(folder_path,pdf_path,arr[i],i)
 		
 def gen_pdf(pid):
+	folder_path = create_dir()
+	#if exists send 500 error
+	if folder_path == None:
+		return jsonify({
+			'status': 500
+		})
+	#get pdf from db
 	pdf = Pdf.query.get(pid)
 	#check if excel is attatched to it
 	if not pdf.efile:
@@ -111,14 +139,12 @@ def gen_pdf(pid):
 		}), 400
 
 	pfile = pdf.pfile
-	pdf_data = BytesIO(pfile)
-	pdf_data.seek(0)
+	pname = pdf.pname
+	#set path to pdf and save pdf
+	pdf_path = os.path.join(folder_path,pname)
+	f = open(pdf_path,'wb')
+	f.write(pfile)
 	#read excel and fill pdf
-	zip_col = process_excel(pdf, pdf_data)
-	
-	pdfs = BytesIO()
-	with zipfile.ZipFile(pdfs, mode = 'w') as zip:
-		for idx, i in enumerate(zip_col):
-			zip.writestr('des'+str(idx)+'.pdf',i.read())
-	pdfs.seek(0)
-	return send_file(pdfs, attachment_filename='pdf.zip', as_attachment=True, mimetype='application/zip')
+	process_excel(pdf, folder_path, pdf_path)
+	create_zip(folder_path, [pname, pdf.ename])
+	return send_file(os.path.join(folder_path,'pdf.zip'))

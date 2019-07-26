@@ -60,5 +60,5 @@ def pdf_create(*args, **kwargs):
 @cross_origin(supports_credentials=True)
 @logged
 @belongs_to
-def pdf_fill(pid):
+def pdf_fill(pid, *args, **kwargs):
 	return gen_pdf(pid)
